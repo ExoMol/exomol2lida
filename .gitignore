@@ -1,4 +1,8 @@
-# IDE:
+# Local settings
+exomol2lida/config/*local.py
+test.py
+
+# IDE
 .idea
 
 # Byte-compiled / optimized / DLL files
