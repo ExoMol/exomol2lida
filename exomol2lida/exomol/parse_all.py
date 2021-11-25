@@ -224,7 +224,8 @@ def parse_exomol_all(path=None):
 
     Examples
     --------
-    >>> exomol_all_instance = parse_exomol_all(path=None)
+    >>> file_path = Path(__file__).parent.joinpath('test_file.all')
+    >>> exomol_all_instance = parse_exomol_all(path=file_path)
     >>> all_molecules = exomol_all_instance.molecules
     >>> type(all_molecules)
     <class 'dict'>

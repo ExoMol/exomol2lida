@@ -1,6 +1,7 @@
 # Local settings
-exomol2lida/config/*local.py
+config/*local.py
 test.py
+.test_data
 
 # IDE
 .idea

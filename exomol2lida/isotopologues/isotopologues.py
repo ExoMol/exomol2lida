@@ -1,5 +1,8 @@
 from pyvalem.formula import Formula
-from atomic_isotope_abundances import get_nist_isotopes_abundances
+
+from exomol2lida.isotopologues.atomic_isotope_abundances import (
+    get_nist_isotopes_abundances
+)
 
 
 def get_preferred_isotopologue(molecule_formula):
@@ -17,8 +20,8 @@ def get_preferred_isotopologue(molecule_formula):
     Returns
     -------
     str
-        The formula of what is assumed to be the most abundad isotopologue corresponding
-        to the passed molecular formula. E.g. '(1H)2(16O)', or '(12C)+'.
+        The formula of what is assumed to be the most abundad isotopologue
+        corresponding to the passed molecular formula. E.g. '(1H)2(16O)', or '(12C)+'.
 
     Examples
     --------
