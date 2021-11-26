@@ -1,7 +1,10 @@
 {
   "H2O": {
     "iso_formula": "(1H)2(16O)",
-    "dataset_name": "POKAZATEL"
+    "dataset_name": "POKAZATEL",
+    "el_state_columns": null,
+    "vib_state_columns": ["v1", "v2", "v3"],
+    "energy_max": 10000
   },
   "CO2": {
     "iso_formula": "(12C)(16O)2",
@@ -46,10 +49,6 @@
   "H2CO": {
     "iso_formula": "(1H)2(12C)(16O)",
     "dataset_name": "AYTY"
-  },
-  "N2": {
-    "iso_formula": "(14N)2",
-    "dataset_name": "WCCRMT"
   },
   "HCN": {
     "iso_formula": "(1H)(12C)(14N)",
@@ -117,7 +116,9 @@
   },
   "SiH": {
     "iso_formula": "(28Si)(1H)",
-    "dataset_name": "SiGHTLY"
+    "dataset_name": "SiGHTLY",
+    "el_state_columns": ["State"],
+    "vib_state_columns": ["v"]
   },
   "AlH": {
     "iso_formula": "(27Al)(1H)",
@@ -151,7 +152,8 @@
     "iso_formula": "(4He)(1H)+",
     "dataset_name": "ADJSAAM"
   },
-  "H2+": {
+  "HD+": {
+    "orig_formula": "H2+",
     "iso_formula": "(1H)(2H)+",
     "dataset_name": "ADJSAAM"
   },
