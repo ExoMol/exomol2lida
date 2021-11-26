@@ -4,7 +4,6 @@
     "dataset_name": "POKAZATEL",
     "el_state_columns": null,
     "vib_state_columns": ["v1", "v2", "v3"],
-    "energy_max": 10000
   },
   "CO2": {
     "iso_formula": "(12C)(16O)2",

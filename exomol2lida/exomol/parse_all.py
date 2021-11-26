@@ -4,6 +4,8 @@ from pathlib import Path
 
 import requests
 
+from utils import parse_exomol_line
+
 res_dir = Path(__file__).parent.absolute().resolve()
 
 ExomolAll = namedtuple(
@@ -72,50 +74,26 @@ def _parse_exomol_all_raw(exomol_all_raw):
         namedtuple instance.
     """
 
-    def parse_line(expected_comment):
-        """Parse the top line among the lines (defined outside in the closure).
-        Changes the lines instance as an externality (by popping the first
-        line)!
-
-        Parameters
-        ----------
-        expected_comment : str
-
-        Returns
-        -------
-        str
-        """
-        while True:
-            line = lines.pop(0)
-            line_num = n - len(lines)
-            if line:
-                break
-            else:
-                warnings.warn(f'Empty line detected on line {line_num}!')
-        try:
-            val, comment = line.split('# ')
-        except ValueError:
-            raise AssertionError(f'Inconsistency detected on line {line_num}!')
-        assert comment == expected_comment, \
-            f'Inconsistent comment detected on line {line_num}!'
-        return val.strip()
-
     lines = exomol_all_raw.split('\n')
-    n = len(lines)
+    n_orig = len(lines)
 
-    exomol_id = parse_line('ID')
+    exomol_id = parse_exomol_line(lines, n_orig, 'ID')
 
-    all_version = parse_line('Version number with format YYYYMMDD')
+    all_version = parse_exomol_line(lines, n_orig,
+                                    'Version number with format YYYYMMDD')
 
-    num_molecules = parse_line('Number of molecules in the database')
+    num_molecules = parse_exomol_line(lines, n_orig,
+                                      'Number of molecules in the database')
     num_molecules = int(num_molecules)
     molecules = {}
 
-    num_all_isotopologues = parse_line('Number of isotopologues in the database')
+    num_all_isotopologues = parse_exomol_line(lines, n_orig,
+                                              'Number of isotopologues in the database')
     num_all_isotopologues = int(num_all_isotopologues)
     all_isotopologues = []
 
-    num_all_datasets = parse_line('Number of datasets in the database')
+    num_all_datasets = parse_exomol_line(lines, n_orig,
+                                         'Number of datasets in the database')
     num_all_datasets = int(num_all_datasets)
     all_datasets = set()
 
@@ -123,30 +101,32 @@ def _parse_exomol_all_raw(exomol_all_raw):
 
     # loop over molecules:
     for _ in range(num_molecules):
-        num_names = parse_line('Number of molecule names listed')
+        num_names = parse_exomol_line(lines, n_orig, 'Number of molecule names listed')
         num_names = int(num_names)
         names = []
 
         # loop over the molecule names:
         for __ in range(num_names):
-            name = parse_line('Name of the molecule')
+            name = parse_exomol_line(lines, n_orig, 'Name of the molecule')
             names.append(name)
 
         assert num_names == len(names)
 
-        formula = parse_line('Molecule chemical formula')
+        formula = parse_exomol_line(lines, n_orig, 'Molecule chemical formula')
 
-        num_isotopologues = parse_line('Number of isotopologues considered')
+        num_isotopologues = parse_exomol_line(lines, n_orig,
+                                              'Number of isotopologues considered')
         num_isotopologues = int(num_isotopologues)
         isotopologues = {}
 
         # loop over the isotopologues:
         for __ in range(num_isotopologues):
-            inchi_key = parse_line('Inchi key of isotopologue')
-            iso_slug = parse_line('Iso-slug')
-            iso_formula = parse_line('IsoFormula')
-            dataset_name = parse_line('Isotopologue dataset name')
-            version = parse_line('Version number with format YYYYMMDD')
+            inchi_key = parse_exomol_line(lines, n_orig, 'Inchi key of isotopologue')
+            iso_slug = parse_exomol_line(lines, n_orig, 'Iso-slug')
+            iso_formula = parse_exomol_line(lines, n_orig, 'IsoFormula')
+            dataset_name = parse_exomol_line(lines, n_orig, 'Isotopologue dataset name')
+            version = parse_exomol_line(lines, n_orig,
+                                        'Version number with format YYYYMMDD')
 
             isotopologue = Isotopologue(
                 inchi_key, iso_slug, iso_formula, dataset_name, version
@@ -241,3 +221,8 @@ def parse_exomol_all(path=None):
     # print(exomol_all_raw)
     exomol_all = _parse_exomol_all_raw(exomol_all_raw)
     return exomol_all
+
+
+if __name__ == '__main__':
+    inst = parse_exomol_all(Path(__file__).parent.joinpath('test_file.all'))
+    print('number of molecules: ', len(inst.molecules))
