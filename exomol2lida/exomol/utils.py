@@ -55,7 +55,7 @@ def parse_exomol_line(lines, n_orig, expected_comment=None):
     """
 
     while True:
-        line = lines.pop(0)
+        line = lines.pop(0).strip()
         line_num = n_orig - len(lines)
         if line:
             break
@@ -65,6 +65,6 @@ def parse_exomol_line(lines, n_orig, expected_comment=None):
         val, comment = line.split('# ')
     except ValueError:
         raise AssertionError(f'Inconsistency detected on line {line_num}!')
-    assert comment == expected_comment, \
-        f'Inconsistent comment detected on line {line_num}!'
+    if comment != expected_comment:
+        warnings.warn(f'Unexpected comment detected on line {line_num}!')
     return val.strip()

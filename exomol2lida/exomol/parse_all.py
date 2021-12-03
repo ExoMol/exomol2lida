@@ -3,8 +3,9 @@ from collections import namedtuple
 from pathlib import Path
 
 import requests
+from pyvalem.formula import Formula
 
-from utils import parse_exomol_line
+from .utils import parse_exomol_line
 
 res_dir = Path(__file__).parent.absolute().resolve()
 
@@ -13,7 +14,7 @@ ExomolAll = namedtuple(
 )
 
 Molecule = namedtuple(
-    'Molecule', 'num_names names formula num_isotopologues isotopologues'
+    'Molecule', 'num_names names formula slug num_isotopologues isotopologues'
 )
 
 Isotopologue = namedtuple(
@@ -150,9 +151,10 @@ def _parse_exomol_all_raw(exomol_all_raw):
                 for isotopologue in isotopologues.values()
         )):
             molecules_with_duplicate_isotopologues.append(formula)
-
+        # molecule slug is not present in the exomol.all data!
+        slug = Formula(formula).slug
         molecule = Molecule(
-            num_names, names, formula, num_isotopologues, isotopologues
+            num_names, names, formula, slug, num_isotopologues, isotopologues
         )
         molecules[formula] = molecule
 

@@ -4,7 +4,7 @@ from collections import namedtuple
 import requests
 from pyvalem.formula import Formula
 
-from utils import parse_exomol_line
+from .utils import parse_exomol_line
 
 ExomolDefBase = namedtuple(
     'ExomolDefBase',

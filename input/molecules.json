@@ -2,8 +2,6 @@
   "H2O": {
     "iso_formula": "(1H)2(16O)",
     "dataset_name": "POKAZATEL",
-    "el_state_columns": null,
-    "vib_state_columns": ["v1", "v2", "v3"],
   },
   "CO2": {
     "iso_formula": "(12C)(16O)2",
@@ -116,8 +114,6 @@
   "SiH": {
     "iso_formula": "(28Si)(1H)",
     "dataset_name": "SiGHTLY",
-    "el_state_columns": ["State"],
-    "vib_state_columns": ["v"]
   },
   "AlH": {
     "iso_formula": "(27Al)(1H)",
