@@ -4,6 +4,5 @@ pandas==1.1.5
 tqdm==4.62.3
 requests==2.26.0
 lxml==4.6.4
-pyparsing==3.0.6
-git+git://github.com/xnx/pyvalem#egg=pyvalem
+pyvalem==2.3.0
 importlib-resources==5.4.0
