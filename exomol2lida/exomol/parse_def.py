@@ -6,8 +6,8 @@ from pyvalem.formula import Formula
 
 from utils import parse_exomol_line
 
-ExomolDef = namedtuple(
-    'ExomolDef',
+ExomolDefBase = namedtuple(
+    'ExomolDefBase',
     ['id', 'iso_formula', 'iso_slug', 'dataset_name', 'version', 'inchi_key',
      'isotopes', 'mass', 'symmetry_group', 'irreducible_representations', 'max_temp',
      'num_pressure_broadeners', 'dipole_availability', 'num_cross_sections',
@@ -31,6 +31,12 @@ QuantumCase = namedtuple(
 Quantum = namedtuple(
     'Quantum', 'label format description'
 )
+
+
+class ExomolDef(ExomolDefBase):
+    @property
+    def quanta_labels(self):
+        return [q.label for q in self.quanta]
 
 
 def _get_exomol_def_raw(
@@ -87,8 +93,9 @@ def _parse_exomol_def_raw(exomol_def_raw):
     Returns
     -------
     ExomolDef
-        Named tuple holding all the (now structured) data. See the ExomolDef
-        namedtuple instance.
+        Custom named tuple holding all the (now structured) data. See the
+        ExomolDefBase namedtuple instance. This class also defines additional
+        functionality on top of the ExomolDefBase, such as quanta_labels attribute.
     """
     lines = exomol_def_raw.split('\n')
     n_orig = len(lines)
@@ -199,8 +206,9 @@ def parse_exomol_def(
     Returns
     -------
     ExomolDef
-        Named tuple holding all the (now structured) data. See the ExomolDef
-        namedtuple instance.
+        Custom named tuple holding all the (now structured) data. See the
+        ExomolDefBase namedtuple instance. This class also defines additional
+        functionality on top of the ExomolDefBase, such as quanta_labels attribute.
 
     Examples
     --------
@@ -219,8 +227,8 @@ def parse_exomol_def(
     'CLT'
     >>> type(exomol_def.isotopes[0])
     <class 'parse_def.Isotope'>
-    >>> len(exomol_def.quanta)
-    1
+    >>> exomol_def.quanta_labels
+    ['v']
     >>> parse_exomol_def(molecule_slug='foo')
     Traceback (most recent call last):
       ...
