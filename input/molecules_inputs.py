@@ -57,7 +57,7 @@ class MoleculeInput:
         if not self.states_path.is_file():
             raise MoleculeInputError(
                 f'The .states file not found under {self.states_path}')
-        trans_wc = f'{file_name_stem}__*.trans.bz2'
+        trans_wc = f'{file_name_stem}*.trans.bz2'
         self.trans_paths = sorted(ds_root.glob(trans_wc))
         if not len(self.trans_paths):
             raise MoleculeInputError(
