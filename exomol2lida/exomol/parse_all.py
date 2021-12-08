@@ -12,12 +12,11 @@ project_dir = file_dir.parent.parent
 test_resources = project_dir.joinpath('test', 'resources')
 
 ExomolAll = namedtuple(
-    'ExomolAll', 'id version num_molecules num_isotopologues num_datasets molecules'
+    'ExomolAll',
+    'raw_text id version num_molecules num_isotopologues num_datasets molecules'
 )
 
-Molecule = namedtuple(
-    'Molecule', 'num_names names formula slug num_isotopologues isotopologues'
-)
+Molecule = namedtuple('Molecule', 'names formula isotopologues')
 
 Isotopologue = namedtuple(
     'Isotopologue', 'inchi_key iso_slug iso_formula dataset_name version'
@@ -40,16 +39,6 @@ def _get_exomol_all_raw(path=None):
     -------
     str
         Raw text of the exomol.all file.
-
-    Examples
-    --------
-    >>> _get_exomol_all_raw('foo')
-    Traceback (most recent call last):
-      ...
-    FileNotFoundError: [Errno 2] No such file or directory: 'foo'
-    >>> exomol_all_raw = _get_exomol_all_raw(path=None)
-    >>> type(exomol_all_raw)
-    <class 'str'>
     """
     if path is None:
         return requests.get('https://www.exomol.com/db/exomol.all').text
@@ -80,113 +69,81 @@ def _parse_exomol_all_raw(exomol_all_raw):
     lines = exomol_all_raw.split('\n')
     n_orig = len(lines)
 
-    exomol_id = parse_exomol_line(lines, n_orig, 'ID')
+    def parse_line(comment, val_type=None):
+        return parse_exomol_line(
+            lines, n_orig, comment, file_name='exomol.all', val_type=val_type,
+            raise_warnings=True)
 
-    all_version = parse_exomol_line(lines, n_orig,
-                                    'Version number with format YYYYMMDD')
+    kwargs = {
+        'raw_text': exomol_all_raw, 'id': parse_line('ID'),
+        'version': parse_line('Version number with format YYYYMMDD', int),
+        'num_molecules': parse_line('Number of molecules in the database', int),
+        'num_isotopologues': parse_line('Number of isotopologues in the database', int),
+        'num_datasets': parse_line('Number of datasets in the database', int),
+        'molecules': {}
+    }
 
-    num_molecules = parse_exomol_line(lines, n_orig,
-                                      'Number of molecules in the database')
-    num_molecules = int(num_molecules)
-    molecules = {}
-
-    num_all_isotopologues = parse_exomol_line(
-        lines, n_orig, 'Number of isotopologues in the database')
-    num_all_isotopologues = int(num_all_isotopologues)
+    # I shall verify the numbers of isotopologues and datasets by keeping track:
     all_isotopologues = []
-
-    num_all_datasets = parse_exomol_line(lines, n_orig,
-                                         'Number of datasets in the database')
-    num_all_datasets = int(num_all_datasets)
     all_datasets = set()
-
     molecules_with_duplicate_isotopologues = []
 
     # loop over molecules:
-    for _ in range(num_molecules):
-        num_names = parse_exomol_line(
-            lines, n_orig, 'Number of molecule names listed')
-        num_names = int(num_names)
-        names = []
+    for _ in range(kwargs['num_molecules']):
+        mol_kwargs = {
+            'names': [],
+            'isotopologues': {}
+        }
+
+        num_names = parse_line('Number of molecule names listed', int)
 
         # loop over the molecule names:
         for __ in range(num_names):
-            name = parse_exomol_line(lines, n_orig, 'Name of the molecule')
-            names.append(name)
+            mol_kwargs['names'].append(parse_line('Name of the molecule'))
 
-        assert num_names == len(names)
-
-        formula = parse_exomol_line(lines, n_orig, 'Molecule chemical formula')
-
-        num_isotopologues = parse_exomol_line(lines, n_orig,
-                                              'Number of isotopologues considered')
-        num_isotopologues = int(num_isotopologues)
-        isotopologues = {}
+        mol_kwargs['formula'] = parse_line('Molecule chemical formula')
+        num_isotopologues = parse_line('Number of isotopologues considered', int)
 
         # loop over the isotopologues:
         for __ in range(num_isotopologues):
-            inchi_key = parse_exomol_line(lines, n_orig, 'Inchi key of isotopologue')
-            iso_slug = parse_exomol_line(lines, n_orig, 'Iso-slug')
-            iso_formula = parse_exomol_line(lines, n_orig, 'IsoFormula')
-            dataset_name = parse_exomol_line(
-                lines, n_orig, 'Isotopologue dataset name')
-            version = parse_exomol_line(lines, n_orig,
-                                        'Version number with format YYYYMMDD')
+            iso_kwargs = {
+                'inchi_key': parse_line('Inchi key of isotopologue'),
+                'iso_slug': parse_line('Iso-slug'),
+                'iso_formula': parse_line('IsoFormula'),
+                'dataset_name': parse_line('Isotopologue dataset name'),
+                'version': parse_line('Version number with format YYYYMMDD', int),
+            }
 
-            isotopologue = Isotopologue(
-                inchi_key, iso_slug, iso_formula, dataset_name, version
-            )
-
-            if iso_formula not in isotopologues:
-                isotopologues[iso_formula] = isotopologue
+            isotopologue = Isotopologue(**iso_kwargs)
+            if iso_kwargs['iso_formula'] not in mol_kwargs['isotopologues']:
+                mol_kwargs['isotopologues'][iso_kwargs['iso_formula']] = isotopologue
             else:
                 warnings.warn(
-                    f'{formula} lists more than one dataset for isotopologue '
-                    f'{iso_formula}: Ignoring {dataset_name}'
+                    f'{mol_kwargs["formula"]} lists more than one dataset for '
+                    f'isotopologue {iso_kwargs["iso_formula"]}: '
+                    f'Ignoring {iso_kwargs["dataset_name"]}'
                 )
+                molecules_with_duplicate_isotopologues.append(mol_kwargs['formula'])
 
-            all_datasets.add(dataset_name)
+            all_datasets.add(iso_kwargs['dataset_name'])
             all_isotopologues.append(isotopologue)
 
-        # check if all the isotopologues are in fact different
-        # (only a single dataset should be recommended):
-        if len(isotopologues) != len(set(
-                isotopologue.iso_formula
-                for isotopologue in isotopologues.values()
-        )):
-            molecules_with_duplicate_isotopologues.append(formula)
         # molecule slug is not present in the exomol.all data!
-        slug = Formula(formula).slug
-        molecule = Molecule(
-            num_names, names, formula, slug, num_isotopologues, isotopologues
-        )
-        molecules[formula] = molecule
+        kwargs['molecules'][mol_kwargs['formula']] = Molecule(**mol_kwargs)
 
-    # final assertions:
-    if len(molecules_with_duplicate_isotopologues):
+    if kwargs['num_isotopologues'] != len(all_isotopologues):
         warnings.warn(
-            f'Molecules with duplicate isotopologues detected: '
-            f'{molecules_with_duplicate_isotopologues}'
-        )
-
-    assert num_molecules == len(molecules)
-
-    if num_all_isotopologues != len(all_isotopologues):
-        warnings.warn(
-            f'Number of isotopologues stated ({num_all_isotopologues}) does not '
+            f'Number of isotopologues stated ({kwargs["num_isotopologues"]}) does not '
             f'match the actual number ({len(all_isotopologues)})!'
         )
 
-    if num_all_datasets != len(all_datasets):
+    if kwargs['num_datasets'] != len(all_datasets):
         warnings.warn(
-            f'Number of datasets stated ({num_all_datasets}) does not match the '
+            f'Number of datasets stated ({kwargs["num_datasets"]}) does not match the '
             f'actual number ({len(all_datasets)})!'
         )
 
-    return ExomolAll(
-        exomol_id, all_version, num_molecules, num_all_isotopologues,
-        num_all_datasets, molecules
-    )
+    return ExomolAll(**kwargs)
 
 
 def parse_exomol_all(path=None):
@@ -223,7 +180,8 @@ def parse_exomol_all(path=None):
     """
 
     exomol_all_raw = _get_exomol_all_raw(path)
-    # print(exomol_all_raw)
+    with open('test/resources/exomol_real.all', 'w') as fp:
+        print(exomol_all_raw, file=fp)
     exomol_all = _parse_exomol_all_raw(exomol_all_raw)
     return exomol_all
 

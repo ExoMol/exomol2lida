@@ -321,13 +321,6 @@ def parse_exomol_def(
     Traceback (most recent call last):
       ...
     ValueError: If path not specified, you must pass all the other parameters!
-
-    # the .def file might be requested straight from the ExoMol API:
-    >>> h2p_def = parse_exomol_def(molecule_slug='H2_p',
-    ...                            isotopologue_slug='1H-2H_p',
-    ...                            dataset_name='CLT')
-    >>> h2p_def.iso_formula
-    '(1H)(2H)+'
     """
     raw_text = _get_exomol_def_raw(
         path=path, molecule_slug=molecule_slug, isotopologue_slug=isotopologue_slug,
