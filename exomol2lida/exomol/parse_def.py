@@ -187,7 +187,7 @@ def _parse_exomol_def_raw(exomol_def_raw, file_name, raise_warnings=True):
         try:
             formula = Formula(kwargs['iso_formula'])
         except FormulaParseError as e:
-            raise ExomolDefParseError(str(e))
+            raise ExomolDefParseError(f'{str(e)} (raised in {file_name})')
         if len(formula.atoms) != num_atoms:
             if raise_warnings:
                 warnings.warn(f'Incorrect number of atoms in {kwargs["iso_slug"]}__'

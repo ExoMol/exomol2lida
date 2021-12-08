@@ -70,7 +70,7 @@ class MoleculeInput:
         states_header_from_def = self.parsed_def.get_states_header_complete()
         num_columns_from_states = get_num_columns(self.states_path)
         if len(states_header_from_def) + 1 != num_columns_from_states:
-            msg = f'{self.states_path.name} only has {num_columns_from_states} ' \
+            msg = f'{self.states_path.name} has {num_columns_from_states} ' \
                   f'columns, while {self.def_path.name} specifies ' \
                   f'{len(states_header_from_def) + 1} columns.'
             raise DefStatesMismatchError(msg)
