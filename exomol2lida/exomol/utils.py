@@ -1,5 +1,7 @@
 import warnings
 
+import pandas as pd
+
 
 class ExomolLineCommentError(Exception):
     pass
@@ -131,3 +133,17 @@ def parse_exomol_line(
             msg += f' in {file_name}'
         warnings.warn(msg)
     return val
+
+
+def load_dataframe_chunks(file_path, chunk_size, column_names=None, index_col=None):
+    df_chunks = pd.read_csv(
+        file_path, compression='bz2', sep=r'\s+', header=None, index_col=index_col,
+        names=column_names, chunksize=chunk_size, iterator=True, low_memory=False
+    )
+    return df_chunks
+
+
+def get_num_columns(file_path):
+    for chunk in load_dataframe_chunks(file_path, chunk_size=1):
+        num_cols = chunk.shape[1]
+        return num_cols

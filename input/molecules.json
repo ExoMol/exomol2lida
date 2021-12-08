@@ -290,12 +290,12 @@
     "dataset_name": "OYT3"
   },
   "cis-P2H2": {
-    "mol_slug": "cis__P2H2",
+    "mol_slug": "cis-P2H2",
     "iso_slug": "cis-31P2-1H2",
     "dataset_name": "OY-Cis"
   },
   "trans-P2H2": {
-    "mol_slug": "trans__P2H2",
+    "mol_slug": "trans-P2H2",
     "iso_slug": "trans-31P2-1H2",
     "dataset_name": "OY-Trans"
   },

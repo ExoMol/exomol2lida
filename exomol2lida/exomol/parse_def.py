@@ -71,9 +71,10 @@ class ExomolDef(ExomolDefBase):
         Returns
         -------
         list[str]
-            First 4 - 6 columns in the .states file as expected
+            First 3 - 5 columns in the .states file as expected, the state index is
+            not counted.
         """
-        header = ['i', 'E', 'g_tot', 'J']
+        header = ['E', 'g_tot', 'J']
         if self.lifetime_availability:
             header.append('tau')
         if self.lande_factor_availability:
