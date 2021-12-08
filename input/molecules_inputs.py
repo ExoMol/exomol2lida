@@ -1,5 +1,9 @@
-from pathlib import Path
+# TODO: Write some docstrings and doctests, should be detailed that MoleculeInput
+#       class does all sorts of verification. Cleanly instantiated MoleculeInput
+#       should be directly runnable to process the ExoMol data and get outputs.
+
 import json
+from pathlib import Path
 
 from config.config import EXOMOL_DATA_DIR
 from exomol2lida.exomol.parse_def import parse_exomol_def, ExomolDefParseError

@@ -3,7 +3,6 @@ from collections import namedtuple
 from pathlib import Path
 
 import requests
-from pyvalem.formula import Formula
 
 from exomol2lida.exomol.utils import parse_exomol_line
 
@@ -180,12 +179,5 @@ def parse_exomol_all(path=None):
     """
 
     exomol_all_raw = _get_exomol_all_raw(path)
-    with open('test/resources/exomol_real.all', 'w') as fp:
-        print(exomol_all_raw, file=fp)
     exomol_all = _parse_exomol_all_raw(exomol_all_raw)
     return exomol_all
-
-
-if __name__ == '__main__':
-    inst = parse_exomol_all(Path(__file__).parent.joinpath('test_file.all'))
-    print('number of molecules: ', len(inst.molecules))

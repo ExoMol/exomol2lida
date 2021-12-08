@@ -1,4 +1,5 @@
 import warnings
+from pathlib import Path
 
 import pandas as pd
 
@@ -138,6 +139,35 @@ on line 4 in foo
 
 
 def load_dataframe_chunks(file_path, chunk_size, column_names=None, index_col=None):
+    """
+    Loads chunks of either .states.bz2 file or .trans.bz2 file, with specified
+    chunk size.
+
+    Parameters
+    ----------
+    file_path : str | Path
+        path to the file I want to load in - either .states or .trans file (bz2).
+    chunk_size : int
+        normally loaded from config, appropriate value depends on RAM
+    column_names : list[str], optional
+        column names of the file loaded. Without the index column, if specified
+    index_col : int, optional
+        index column number, None by default.
+
+    Returns
+    -------
+    df_chunks : pandas.io.parsers.TextFileReader
+        chunks of the read pd.DataFrame. Access by `for chunk in df_chunks: ...`, where
+        each chunk is a pd.DataFrame.
+
+    Examples
+    --------
+    >>> load_dataframe_chunks(
+    ...     file_path='foo', chunk_size=10_000, column_names=None, index_col=0)
+    Traceback (most recent call last):
+      ...
+    FileNotFoundError: [Errno 2] No such file or directory: 'foo'
+    """
     df_chunks = pd.read_csv(
         file_path, compression='bz2', sep=r'\s+', header=None, index_col=index_col,
         names=column_names, chunksize=chunk_size, iterator=True, low_memory=False
@@ -146,6 +176,25 @@ def load_dataframe_chunks(file_path, chunk_size, column_names=None, index_col=No
 
 
 def get_num_columns(file_path):
+    """
+    Gets the number of columns in the .bz2 compressed either .states or .trans file
+    under the file_path.
+
+    Parameters
+    ----------
+    file_path : str | Path
+
+    Returns
+    -------
+    int
+    
+    Examples
+    --------
+    >>> get_num_columns(file_path='foo')
+    Traceback (most recent call last):
+      ...
+    FileNotFoundError: [Errno 2] No such file or directory: 'foo'
+    """
     for chunk in load_dataframe_chunks(file_path, chunk_size=1):
         num_cols = chunk.shape[1]
         return num_cols

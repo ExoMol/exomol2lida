@@ -8,7 +8,6 @@ from pyvalem.formula import Formula, FormulaParseError
 from exomol2lida.exomol.utils import (
     parse_exomol_line, ExomolLineValueError, ExomolLineCommentError)
 
-
 file_dir = Path(__file__).parent.resolve()
 project_dir = file_dir.parent.parent
 test_resources = project_dir.joinpath('test', 'resources')
@@ -56,6 +55,7 @@ class ExomolDef(ExomolDefBase):
     ----------
     all the attributes defined in ExomolDefBase (see the namedtuple call)
     """
+
     @property
     def quanta_labels(self):
         """
