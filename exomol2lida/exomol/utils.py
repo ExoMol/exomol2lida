@@ -83,13 +83,15 @@ def parse_exomol_line(
     >>> parse_exomol_line(lns, n, file_name='C60.def')
     Traceback (most recent call last):
       ...
-    utils.ExomolLineCommentError: Unexpected line format detected on line 3 in C60.def
+    exomol2lida.exomol.utils.ExomolLineCommentError: Unexpected line format detected \
+on line 3 in C60.def
 
     >>> parse_exomol_line(
     ...     lns, n, expected_comment='comment4', file_name='foo', val_type=int)
     Traceback (most recent call last):
       ...
-    utils.ExomolLineValueError: Unexpected value type detected on line 4 in foo
+    exomol2lida.exomol.utils.ExomolLineValueError: Unexpected value type detected \
+on line 4 in foo
 
     >>> lns
     []

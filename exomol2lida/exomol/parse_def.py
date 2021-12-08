@@ -9,6 +9,11 @@ from exomol2lida.exomol.utils import (
     parse_exomol_line, ExomolLineValueError, ExomolLineCommentError)
 
 
+file_dir = Path(__file__).parent.resolve()
+project_dir = file_dir.parent.parent
+test_resources = project_dir.joinpath('test', 'resources')
+
+
 class ExomolDefParseError(Exception):
     pass
 
@@ -296,28 +301,33 @@ def parse_exomol_def(
       ...
     FileNotFoundError: [Errno 2] No such file or directory: 'foo.def'
 
-    >>> exomol_def = parse_exomol_def(molecule_slug='H2_p',
-    ...                               isotopologue_slug='1H-2H_p',
-    ...                               dataset_name='CLT')
+    >>> exomol_def = parse_exomol_def(path=test_resources / '40Ca-1H__Yadin.def')
     >>> type(exomol_def)
-    <class 'parse_def.ExomolDef'>
+    <class 'exomol2lida.exomol.parse_def.ExomolDef'>
 
     >>> exomol_def.id
     'EXOMOL.def'
 
     >>> exomol_def.dataset_name
-    'CLT'
+    'Yadin'
 
     >>> type(exomol_def.isotopes[0])
-    <class 'parse_def.Isotope'>
+    <class 'exomol2lida.exomol.parse_def.Isotope'>
 
     >>> exomol_def.quanta_labels
-    ['v']
+    ['par', 'v', 'N', 'e/f']
 
     >>> parse_exomol_def(molecule_slug='foo')
     Traceback (most recent call last):
       ...
     ValueError: If path not specified, you must pass all the other parameters!
+
+    # the .def file might be requested straight from the ExoMol API:
+    >>> h2p_def = parse_exomol_def(molecule_slug='H2_p',
+    ...                            isotopologue_slug='1H-2H_p',
+    ...                            dataset_name='CLT')
+    >>> h2p_def.iso_formula
+    '(1H)(2H)+'
     """
     raw_text = _get_exomol_def_raw(
         path=path, molecule_slug=molecule_slug, isotopologue_slug=isotopologue_slug,
