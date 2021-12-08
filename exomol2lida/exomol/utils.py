@@ -1,7 +1,17 @@
 import warnings
 
 
-def parse_exomol_line(lines, n_orig, expected_comment=None):
+class ExomolLineCommentError(Exception):
+    pass
+
+
+class ExomolLineValueError(Exception):
+    pass
+
+
+def parse_exomol_line(
+        lines, n_orig, expected_comment=None, file_name=None, val_type=None,
+        raise_warnings=False):
     """Line parser for the ExoMol files (.all and .def).
 
     List of the file lines is passed as well as the original length of the list.
@@ -22,49 +32,102 @@ def parse_exomol_line(lines, n_orig, expected_comment=None):
     expected_comment : str
         The comment after the # symbol on each line is expected to match the
         passed expected comment.
+    file_name : str
+        The name of the file that lines belonged to (for error raising only).
+    val_type : type
+        The intended type of the parsed value, the value will be converted to.
+    raise_warnings : bool
+        If True, warning will be raised if the parsed comment does not match the
+        expected comment.
 
     Returns
     -------
-    str
-        Value belonging to the top line in lines passed.
+    str | int | float
+        Value belonging to the top line in lines passed. Type is either str, or passed
+        val_type.
 
     Raises
     ------
-    AssertionError
-        If the comment behind # symbol on the top line does not match the
-        expected_comment, or if the top line in lines does not have any comment.
+    ExomolLineCommentError
+        If the top line does not have the required format of value # comment
+    ExomolLineValueError
+        If the value parsed from the top line cannot be converted to the val_type.
+
+    Warnings
+    --------
+    UserWarning
+        If the comment parsed from the top line does not match the expected_comment.
+        Only if warn_on_comment is True.
 
     Examples
     --------
-    >>> lns = ['val1 # comment1', 'val2 # comment2', 'val3']
+    >>> lns = ['1      # comment1',
+    ...        'val2   # comment2',
+    ...        'val3             ',
+    ...        'val4   # comment4',]
     >>> n = len(lns)
-    >>> parse_exomol_line(lns, n, expected_comment='comment1')
-    'val1'
+    >>> parse_exomol_line(lns, n, expected_comment='comment1', val_type=int)
+    1
+
     >>> lns
-    ['val2 # comment2', 'val3']
-    >>> parse_exomol_line(lns, n, expected_comment='foo')
+    ['val2   # comment2', 'val3             ', 'val4   # comment4']
+
+    >>> parse_exomol_line(lns, n, expected_comment='comment2')
+    'val2'
+
+    >>> lns
+    ['val3             ', 'val4   # comment4']
+
+    >>> parse_exomol_line(lns, n, file_name='C60.def')
     Traceback (most recent call last):
       ...
-    AssertionError: Inconsistent comment detected on line 2!
-    >>> parse_exomol_line(lns, n)
+    utils.ExomolLineCommentError: Unexpected line format detected on line 3 in C60.def
+
+    >>> parse_exomol_line(
+    ...     lns, n, expected_comment='comment4', file_name='foo', val_type=int)
     Traceback (most recent call last):
       ...
-    AssertionError: Inconsistency detected on line 3!
+    utils.ExomolLineValueError: Unexpected value type detected on line 4 in foo
+
     >>> lns
     []
     """
 
     while True:
-        line = lines.pop(0).strip()
+        try:
+            line = lines.pop(0).strip()
+        except IndexError:
+            msg = f'Run out of lines'
+            if file_name:
+                msg += f' in {file_name}'
+            raise ExomolLineValueError(msg)
         line_num = n_orig - len(lines)
         if line:
             break
-        else:
-            warnings.warn(f'Empty line detected on line {line_num}!')
+        elif raise_warnings:
+            msg = f'Empty line detected on line {line_num}'
+            if file_name:
+                msg += f' in {file_name}'
+            warnings.warn(msg)
     try:
         val, comment = line.split('# ')
+        val = val.strip()
     except ValueError:
-        raise AssertionError(f'Inconsistency detected on line {line_num}!')
-    if comment != expected_comment:
-        warnings.warn(f'Unexpected comment detected on line {line_num}!')
-    return val.strip()
+        msg = f'Unexpected line format detected on line {line_num}'
+        if file_name:
+            msg += f' in {file_name}'
+        raise ExomolLineCommentError(msg)
+    if val_type:
+        try:
+            val = val_type(val)
+        except ValueError:
+            msg = f'Unexpected value type detected on line {line_num}'
+            if file_name:
+                msg += f' in {file_name}'
+            raise ExomolLineValueError(msg)
+    if comment != expected_comment and raise_warnings:
+        msg = f'Unexpected comment detected on line {line_num}!'
+        if file_name:
+            msg += f' in {file_name}'
+        warnings.warn(msg)
+    return val

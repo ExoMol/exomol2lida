@@ -1,16 +1,23 @@
 import warnings
 from collections import namedtuple
+from pathlib import Path
 
 import requests
-from pyvalem.formula import Formula
+from pyvalem.formula import Formula, FormulaParseError
 
-from .utils import parse_exomol_line
+from exomol2lida.exomol.utils import (
+    parse_exomol_line, ExomolLineValueError, ExomolLineCommentError)
+
+
+class ExomolDefParseError(Exception):
+    pass
+
 
 ExomolDefBase = namedtuple(
     'ExomolDefBase',
-    ['id', 'iso_formula', 'iso_slug', 'dataset_name', 'version', 'inchi_key',
-     'isotopes', 'mass', 'symmetry_group', 'irreducible_representations', 'max_temp',
-     'num_pressure_broadeners', 'dipole_availability', 'num_cross_sections',
+    ['raw_text', 'id', 'iso_formula', 'iso_slug', 'dataset_name', 'version',
+     'inchi_key', 'isotopes', 'mass', 'symmetry_group', 'irreducible_representations',
+     'max_temp', 'num_pressure_broadeners', 'dipole_availability', 'num_cross_sections',
      'num_k_coefficients', 'lifetime_availability', 'lande_factor_availability',
      'num_states', 'quanta_cases', 'quanta', 'num_transitions', 'num_trans_files',
      'max_wavenumber', 'high_energy_complete']
@@ -34,9 +41,56 @@ Quantum = namedtuple(
 
 
 class ExomolDef(ExomolDefBase):
+    """
+    A structured named tuple containing all the data from a parsed .def file.
+
+    Also contains couple of additional methods on the data, such as the quanta_labels
+    property.
+
+    Attributes
+    ----------
+    all the attributes defined in ExomolDefBase (see the namedtuple call)
+    """
     @property
     def quanta_labels(self):
+        """
+        List of quanta specified by the .def file.
+
+        Returns
+        -------
+        list[str]
+            List of quanta specified by the .def file
+        """
         return [q.label for q in self.quanta]
+
+    def get_states_header_mandatory(self):
+        """
+        List of the mandatory columns expected in the .states file belonging to this
+        .def file.
+
+        Returns
+        -------
+        list[str]
+            First 4 - 6 columns in the .states file as expected
+        """
+        header = ['i', 'E', 'g_tot', 'J']
+        if self.lifetime_availability:
+            header.append('tau')
+        if self.lande_factor_availability:
+            header.append('g_J')
+        return header
+
+    def get_states_header_complete(self):
+        """
+        List of all the columns expected in the .states file belonging to this
+        .def file
+
+        Returns
+        -------
+        list[str]
+            List of column names expected in the relevant .states file
+        """
+        return self.get_states_header_mandatory() + self.quanta_labels
 
 
 def _get_exomol_def_raw(
@@ -78,7 +132,7 @@ def _get_exomol_def_raw(
             return fp.read()
 
 
-def _parse_exomol_def_raw(exomol_def_raw):
+def _parse_exomol_def_raw(exomol_def_raw, file_name, raise_warnings=True):
     """Parse the raw text of the .def file.
 
     Parse the text and construct the ExomolDef object instance holding all
@@ -89,6 +143,11 @@ def _parse_exomol_def_raw(exomol_def_raw):
     exomol_def_raw : str
         Raw text of the .def file. Can be obtained by calling
         _get_exomol_def_raw function.
+    file_name : str
+        Name of the .def file (for error logging purposes only)
+    raise_warnings : bool
+        If to raise warnings. Warning will be raised if an inconsistent def file is
+        detected, but still can be parsed.
 
     Returns
     -------
@@ -100,87 +159,105 @@ def _parse_exomol_def_raw(exomol_def_raw):
     lines = exomol_def_raw.split('\n')
     n_orig = len(lines)
 
-    def parse_line(expected_comment):
-        return parse_exomol_line(lines, n_orig, expected_comment=expected_comment)
+    def parse_line(expected_comment, val_type=None):
+        return parse_exomol_line(
+            lines, n_orig, expected_comment=expected_comment, file_name=file_name,
+            val_type=val_type, raise_warnings=raise_warnings)
 
-    kwargs = {
-        'id': parse_line('ID'),
-        'iso_formula': parse_line('IsoFormula'),
-        'iso_slug': parse_line('Iso-slug'),
-        'dataset_name': parse_line('Isotopologue dataset name'),
-        'version': int(parse_line('Version number with format YYYYMMDD')),
-        'inchi_key': parse_line('Inchi key of molecule'),
-        'isotopes': []
-    }
-    num_atoms = int(parse_line('Number of atoms'))
-    if len(Formula(kwargs['iso_formula']).atoms) != num_atoms:
-        warnings.warn(f'Incorrect number of atoms in {kwargs["iso_slug"]}__'
-                      f'{kwargs["dataset_name"]}.def!')
-        num_atoms = len(Formula(kwargs['iso_formula']).atoms)
-    for i in range(num_atoms):
-        isotope_kwargs = {
-            'number': int(parse_line(f'Isotope number {i + 1}')),
-            'element_symbol': parse_line(f'Element symbol {i + 1}')
+    # catch all the parse_line-originated errors and wrap them in a higher-level
+    # error:
+    try:
+        kwargs = {
+            'raw_text': exomol_def_raw,
+            'id': parse_line('ID'),
+            'iso_formula': parse_line('IsoFormula'),
+            'iso_slug': parse_line('Iso-slug'),
+            'dataset_name': parse_line('Isotopologue dataset name'),
+            'version': parse_line('Version number with format YYYYMMDD', int),
+            'inchi_key': parse_line('Inchi key of molecule'),
+            'isotopes': []
         }
-        isotope = Isotope(**isotope_kwargs)
-        kwargs['isotopes'].append(isotope)
-    iso_mass_amu = float(parse_line('Isotopologue mass (Da) and (kg)').split()[0])
-    kwargs.update({
-        'mass': iso_mass_amu,
-        'symmetry_group': parse_line('Symmetry group'),
-        'irreducible_representations': []
-    })
-    num_irreducible_representations = int(
-        parse_line('Number of irreducible representations'))
-    for _ in range(num_irreducible_representations):
-        ir_kwargs = {
-            'id': int(parse_line('Irreducible representation ID')),
-            'label': parse_line('Irreducible representation label'),
-            'nuclear_spin_degeneracy': int(parse_line('Nuclear spin degeneracy'))
-        }
-        ir = IrreducibleRepresentation(**ir_kwargs)
-        kwargs['irreducible_representations'].append(ir)
-    kwargs.update({
-        'max_temp': float(parse_line('Maximum temperature of linelist')),
-        'num_pressure_broadeners': int(
-            parse_line('No. of pressure broadeners available')),
-        'dipole_availability': bool(parse_line('Dipole availability (1=yes, 0=no)')),
-        'num_cross_sections': int(parse_line('No. of cross section files available')),
-        'num_k_coefficients': int(parse_line('No. of k-coefficient files available')),
-        'lifetime_availability': bool(
-            parse_line('Lifetime availability (1=yes, 0=no)')),
-        'lande_factor_availability': bool(
-            parse_line('Lande g-factor availability (1=yes, 0=no)')),
-        'num_states': int(parse_line('No. of states in .states file')),
-        'quanta_cases': [],
-        'quanta': []
-    })
-    num_quanta_cases = int(parse_line('No. of quanta cases'))
-    for _ in range(num_quanta_cases):
-        kwargs['quanta_cases'].append(
-            QuantumCase(label=parse_line('Quantum case label')))
-    num_quanta = int(parse_line('No. of quanta defined'))
-    for i in range(num_quanta):
-        q_kwargs = {
-            'label': parse_line(f'Quantum label {i + 1}'),
-            'format': parse_line(f'Format quantum label {i + 1}'),
-            'description': parse_line(f'Description quantum label {i + 1}')
-        }
-        quantum = Quantum(**q_kwargs)
-        kwargs['quanta'].append(quantum)
-    kwargs.update({
-        'num_transitions': parse_line('Total number of transitions'),
-        'num_trans_files': parse_line('No. of transition files'),
-        'max_wavenumber': parse_line('Maximum wavenumber (in cm-1)'),
-        'high_energy_complete': parse_line(
-            'Higher energy with complete set of transitions (in cm-1)'),
-    })
+        num_atoms = parse_line('Number of atoms', int)
+        try:
+            formula = Formula(kwargs['iso_formula'])
+        except FormulaParseError as e:
+            raise ExomolDefParseError(str(e))
+        if len(formula.atoms) != num_atoms:
+            if raise_warnings:
+                warnings.warn(f'Incorrect number of atoms in {kwargs["iso_slug"]}__'
+                              f'{kwargs["dataset_name"]}.def!')
+            num_atoms = len(formula.atoms)
+        for i in range(num_atoms):
+            isotope_kwargs = {
+                'number': parse_line(f'Isotope number {i + 1}', int),
+                'element_symbol': parse_line(f'Element symbol {i + 1}')
+            }
+            isotope = Isotope(**isotope_kwargs)
+            kwargs['isotopes'].append(isotope)
+        iso_mass_amu = float(parse_line('Isotopologue mass (Da) and (kg)').split()[0])
+        kwargs.update({
+            'mass': iso_mass_amu,
+            'symmetry_group': parse_line('Symmetry group'),
+            'irreducible_representations': []
+        })
+        num_irreducible_representations = int(
+            parse_line('Number of irreducible representations'))
+        for _ in range(num_irreducible_representations):
+            ir_kwargs = {
+                'id': parse_line('Irreducible representation ID', int),
+                'label': parse_line('Irreducible representation label'),
+                'nuclear_spin_degeneracy': parse_line(
+                    'Nuclear spin degeneracy', int)
+            }
+            ir = IrreducibleRepresentation(**ir_kwargs)
+            kwargs['irreducible_representations'].append(ir)
+        kwargs.update({
+            'max_temp': parse_line('Maximum temperature of linelist', float),
+            'num_pressure_broadeners': parse_line(
+                'No. of pressure broadeners available', int),
+            'dipole_availability': bool(
+                parse_line('Dipole availability (1=yes, 0=no)', int)),
+            'num_cross_sections': parse_line(
+                'No. of cross section files available', int),
+            'num_k_coefficients': parse_line(
+                'No. of k-coefficient files available', int),
+            'lifetime_availability': bool(
+                parse_line('Lifetime availability (1=yes, 0=no)', int)),
+            'lande_factor_availability': bool(
+                parse_line('Lande g-factor availability (1=yes, 0=no)', int)),
+            'num_states': parse_line('No. of states in .states file', int),
+            'quanta_cases': [],
+            'quanta': []
+        })
+        num_quanta_cases = parse_line('No. of quanta cases', int)
+        for _ in range(num_quanta_cases):
+            kwargs['quanta_cases'].append(
+                QuantumCase(label=parse_line('Quantum case label')))
+        num_quanta = parse_line('No. of quanta defined', int)
+        for i in range(num_quanta):
+            q_kwargs = {
+                'label': parse_line(f'Quantum label {i + 1}'),
+                'format': parse_line(f'Format quantum label {i + 1}'),
+                'description': parse_line(f'Description quantum label {i + 1}')
+            }
+            quantum = Quantum(**q_kwargs)
+            kwargs['quanta'].append(quantum)
+        kwargs.update({
+            'num_transitions': parse_line('Total number of transitions'),
+            'num_trans_files': parse_line('No. of transition files'),
+            'max_wavenumber': parse_line('Maximum wavenumber (in cm-1)'),
+            'high_energy_complete': parse_line(
+                'Higher energy with complete set of transitions (in cm-1)'),
+        })
 
-    return ExomolDef(**kwargs)
+        return ExomolDef(**kwargs)
+    except (ExomolLineValueError, ExomolLineCommentError) as e:
+        raise ExomolDefParseError(str(e))
 
 
 def parse_exomol_def(
-        path=None, molecule_slug=None, isotopologue_slug=None, dataset_name=None
+        path=None, molecule_slug=None, isotopologue_slug=None, dataset_name=None,
+        raise_warnings=False
 ):
     """Parse the .def file.
 
@@ -202,6 +279,7 @@ def parse_exomol_def(
     molecule_slug : str
     isotopologue_slug : str
     dataset_name : str
+    raise_warnings : bool
 
     Returns
     -------
@@ -216,19 +294,25 @@ def parse_exomol_def(
     Traceback (most recent call last):
       ...
     FileNotFoundError: [Errno 2] No such file or directory: 'foo.def'
+
     >>> exomol_def = parse_exomol_def(molecule_slug='H2_p',
     ...                               isotopologue_slug='1H-2H_p',
     ...                               dataset_name='CLT')
     >>> type(exomol_def)
     <class 'parse_def.ExomolDef'>
+
     >>> exomol_def.id
     'EXOMOL.def'
+
     >>> exomol_def.dataset_name
     'CLT'
+
     >>> type(exomol_def.isotopes[0])
     <class 'parse_def.Isotope'>
+
     >>> exomol_def.quanta_labels
     ['v']
+
     >>> parse_exomol_def(molecule_slug='foo')
     Traceback (most recent call last):
       ...
@@ -237,4 +321,8 @@ def parse_exomol_def(
     raw_text = _get_exomol_def_raw(
         path=path, molecule_slug=molecule_slug, isotopologue_slug=isotopologue_slug,
         dataset_name=dataset_name)
-    return _parse_exomol_def_raw(raw_text)
+    if path is not None:
+        file_name = Path(path).name
+    else:
+        file_name = f'{isotopologue_slug}__{dataset_name}.def'
+    return _parse_exomol_def_raw(raw_text, file_name, raise_warnings=raise_warnings)

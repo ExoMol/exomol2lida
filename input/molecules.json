@@ -1,319 +1,317 @@
 {
   "H2O": {
-    "iso_formula": "(1H)2(16O)",
-    "dataset_name": "POKAZATEL",
+    "mol_slug": "H2O",
+    "iso_slug": "1H2-16O",
+    "dataset_name": "POKAZATEL"
   },
   "CO2": {
-    "iso_formula": "(12C)(16O)2",
+    "mol_slug": "CO2",
+    "iso_slug": "12C-16O2",
     "dataset_name": "UCL-4000"
   },
   "CO": {
-    "iso_formula": "(12C)(16O)",
+    "mol_slug": "CO",
+    "iso_slug": "12C-16O",
     "dataset_name": "Li2015"
   },
   "CH4": {
-    "iso_formula": "(12C)(1H)4",
+    "mol_slug": "CH4",
+    "iso_slug": "12C-1H4",
     "dataset_name": "YT34to10"
   },
   "NO": {
-    "iso_formula": "(14N)(16O)",
+    "mol_slug": "NO",
+    "iso_slug": "14N-16O",
     "dataset_name": "XABC"
   },
   "SO2": {
-    "iso_formula": "(32S)(16O)2",
+    "mol_slug": "SO2",
+    "iso_slug": "32S-16O2",
     "dataset_name": "ExoAmes"
   },
   "NH3": {
-    "iso_formula": "(14N)(1H)3",
+    "mol_slug": "NH3",
+    "iso_slug": "14N-1H3",
     "dataset_name": "CoYuTe"
   },
   "HNO3": {
-    "iso_formula": "(1H)(14N)(16O)3",
+    "mol_slug": "HNO3",
+    "iso_slug": "1H-14N-16O3",
     "dataset_name": "AIJS"
   },
-  "OH": {
-    "iso_formula": "(16O)(1H)",
-    "dataset_name": "MoLLIST"
-  },
   "HF": {
-    "iso_formula": "(1H)(19F)",
+    "mol_slug": "HF",
+    "iso_slug": "1H-19F",
     "dataset_name": "Coxon-Hajig"
   },
   "HCl": {
-    "iso_formula": "(1H)(35Cl)",
+    "mol_slug": "HCl",
+    "iso_slug": "1H-35Cl",
     "dataset_name": "HITRAN"
   },
   "H2CO": {
-    "iso_formula": "(1H)2(12C)(16O)",
+    "mol_slug": "H2CO",
+    "iso_slug": "1H2-12C-16O",
     "dataset_name": "AYTY"
   },
   "HCN": {
-    "iso_formula": "(1H)(12C)(14N)",
+    "mol_slug": "HCN",
+    "iso_slug": "1H-12C-14N",
     "dataset_name": "Harris"
   },
   "CH3Cl": {
-    "iso_formula": "(12C)(1H)3(35Cl)",
+    "mol_slug": "CH3Cl",
+    "iso_slug": "12C-1H3-35Cl",
     "dataset_name": "OYT"
   },
   "H2O2": {
-    "iso_formula": "(1H)2(16O)2",
+    "mol_slug": "H2O2",
+    "iso_slug": "1H2-16O2",
     "dataset_name": "APTY"
   },
   "C2H2": {
-    "iso_formula": "(12C)2(1H)2",
+    "mol_slug": "C2H2",
+    "iso_slug": "12C2-1H2",
     "dataset_name": "aCeTY"
   },
   "PH3": {
-    "iso_formula": "(31P)(1H)3",
+    "mol_slug": "PH3",
+    "iso_slug": "31P-1H3",
     "dataset_name": "SAlTY"
   },
   "H2S": {
-    "iso_formula": "(1H)2(32S)",
+    "mol_slug": "H2S",
+    "iso_slug": "1H2-32S",
     "dataset_name": "AYT2"
   },
   "C2H4": {
-    "iso_formula": "(12C)2(1H)4",
+    "mol_slug": "C2H4",
+    "iso_slug": "12C2-1H4",
     "dataset_name": "MaYTY"
   },
   "CS": {
-    "iso_formula": "(12C)(32S)",
+    "mol_slug": "CS",
+    "iso_slug": "12C-32S",
     "dataset_name": "JnK"
   },
   "H2": {
-    "iso_formula": "(1H)2",
+    "mol_slug": "H2",
+    "iso_slug": "1H2",
     "dataset_name": "RACPPK"
   },
   "LiH": {
-    "iso_formula": "(7Li)(1H)",
+    "mol_slug": "LiH",
+    "iso_slug": "7Li-1H",
     "dataset_name": "CLT"
   },
   "LiH+": {
-    "iso_formula": "(7Li)(1H)+",
+    "mol_slug": "LiH_p",
+    "iso_slug": "7Li-1H_p",
     "dataset_name": "CLT"
   },
-  "FeH": {
-    "iso_formula": "(56Fe)(1H)",
-    "dataset_name": "MoLLIST"
-  },
-  "TiH": {
-    "iso_formula": "(48Ti)(1H)",
-    "dataset_name": "MoLLIST"
-  },
   "BeH": {
-    "iso_formula": "(9Be)(1H)",
+    "mol_slug": "BeH",
+    "iso_slug": "9Be-1H",
     "dataset_name": "Darby-Lewis"
   },
   "CaH": {
-    "iso_formula": "(40Ca)(1H)",
+    "mol_slug": "CaH",
+    "iso_slug": "40Ca-1H",
     "dataset_name": "Yadin"
   },
-  "CrH": {
-    "iso_formula": "(52Cr)(1H)",
-    "dataset_name": "MoLLIST"
-  },
   "SiH": {
-    "iso_formula": "(28Si)(1H)",
-    "dataset_name": "SiGHTLY",
+    "mol_slug": "SiH",
+    "iso_slug": "28Si-1H",
+    "dataset_name": "SiGHTLY"
   },
   "AlH": {
-    "iso_formula": "(27Al)(1H)",
+    "mol_slug": "AlH",
+    "iso_slug": "27Al-1H",
     "dataset_name": "AlHambra"
   },
   "NaH": {
-    "iso_formula": "(23Na)(1H)",
+    "mol_slug": "NaH",
+    "iso_slug": "23Na-1H",
     "dataset_name": "Rivlin"
   },
   "MgH": {
-    "iso_formula": "(24Mg)(1H)",
+    "mol_slug": "MgH",
+    "iso_slug": "24Mg-1H",
     "dataset_name": "Yadin"
   },
   "SiO": {
-    "iso_formula": "(28Si)(16O)",
+    "mol_slug": "SiO",
+    "iso_slug": "28Si-16O",
     "dataset_name": "EBJT"
   },
   "TiO": {
-    "iso_formula": "(48Ti)(16O)",
+    "mol_slug": "TiO",
+    "iso_slug": "48Ti-16O",
     "dataset_name": "Toto"
   },
   "MgO": {
-    "iso_formula": "(24Mg)(16O)",
+    "mol_slug": "MgO",
+    "iso_slug": "24Mg-16O",
     "dataset_name": "LiTY"
   },
   "H3+": {
-    "iso_formula": "(1H)3+",
+    "mol_slug": "H3_p",
+    "iso_slug": "1H3_p",
     "dataset_name": "MiZATeP"
   },
   "HeH+": {
-    "iso_formula": "(4He)(1H)+",
+    "mol_slug": "HeH_p",
+    "iso_slug": "4He-1H_p",
     "dataset_name": "ADJSAAM"
   },
   "HD+": {
-    "orig_formula": "H2+",
-    "iso_formula": "(1H)(2H)+",
+    "mol_slug": "H2_p",
+    "iso_slug": "1H-2H_p",
     "dataset_name": "ADJSAAM"
   },
   "C2": {
-    "iso_formula": "(12C)2",
+    "mol_slug": "C2",
+    "iso_slug": "12C2",
     "dataset_name": "8states"
   },
   "CN": {
-    "iso_formula": "(12C)(14N)",
+    "mol_slug": "CN",
+    "iso_slug": "12C-14N",
     "dataset_name": "Trihybrid"
   },
-  "CH": {
-    "iso_formula": "(12C)(1H)",
-    "dataset_name": "MoLLIST"
-  },
-  "LiCl": {
-    "iso_formula": "(7Li)(35Cl)",
-    "dataset_name": "MoLLIST"
-  },
   "NaCl": {
-    "iso_formula": "(23Na)(35Cl)",
+    "mol_slug": "NaCl",
+    "iso_slug": "23Na-35Cl",
     "dataset_name": "Barton"
   },
-  "NH": {
-    "iso_formula": "(14N)(1H)",
-    "dataset_name": "MoLLIST"
-  },
   "SO3": {
-    "iso_formula": "(32S)(16O)3",
+    "mol_slug": "SO3",
+    "iso_slug": "32S-16O3",
     "dataset_name": "UYT2"
   },
   "YO": {
-    "iso_formula": "(89Y)(16O)",
+    "mol_slug": "YO",
+    "iso_slug": "89Y-16O",
     "dataset_name": "SSYT"
   },
   "VO": {
-    "iso_formula": "(51V)(16O)",
+    "mol_slug": "VO",
+    "iso_slug": "51V-16O",
     "dataset_name": "VOMYT"
   },
   "SH": {
-    "iso_formula": "(32S)(1H)",
+    "mol_slug": "SH",
+    "iso_slug": "32S-1H",
     "dataset_name": "GYT"
   },
   "AlO": {
-    "iso_formula": "(27Al)(16O)",
+    "mol_slug": "AlO",
+    "iso_slug": "27Al-16O",
     "dataset_name": "ATP"
   },
   "ScH": {
-    "iso_formula": "(45Sc)(1H)",
+    "mol_slug": "ScH",
+    "iso_slug": "45Sc-1H",
     "dataset_name": "LYT"
   },
   "KCl": {
-    "iso_formula": "(39K)(35Cl)",
+    "mol_slug": "KCl",
+    "iso_slug": "39K-35Cl",
     "dataset_name": "Barton"
   },
   "CaO": {
-    "iso_formula": "(40Ca)(16O)",
+    "mol_slug": "CaO",
+    "iso_slug": "40Ca-16O",
     "dataset_name": "VBATHY"
   },
-  "CP": {
-    "iso_formula": "(12C)(31P)",
-    "dataset_name": "MoLLIST"
-  },
   "PN": {
-    "iso_formula": "(31P)(14N)",
+    "mol_slug": "PN",
+    "iso_slug": "31P-14N",
     "dataset_name": "YYLT"
   },
   "PS": {
-    "iso_formula": "(31P)(32S)",
+    "mol_slug": "PS",
+    "iso_slug": "31P-32S",
     "dataset_name": "POPS"
   },
   "PO": {
-    "iso_formula": "(31P)(16O)",
+    "mol_slug": "PO",
+    "iso_slug": "31P-16O",
     "dataset_name": "POPS"
   },
   "SiH4": {
-    "iso_formula": "(28Si)(1H)4",
+    "mol_slug": "SiH4",
+    "iso_slug": "28Si-1H4",
     "dataset_name": "OY2T"
   },
   "NS": {
-    "iso_formula": "(14N)(32S)",
+    "mol_slug": "NS",
+    "iso_slug": "14N-32S",
     "dataset_name": "SNaSH"
   },
   "CH3F": {
-    "iso_formula": "(12C)(1H)3(19F)",
+    "mol_slug": "CH3F",
+    "iso_slug": "12C-1H3-19F",
     "dataset_name": "OYKYT"
   },
   "SiS": {
-    "iso_formula": "(28Si)(32S)",
+    "mol_slug": "SiS",
+    "iso_slug": "28Si-32S",
     "dataset_name": "UCTY"
   },
-  "LiF": {
-    "iso_formula": "(7Li)(19F)",
-    "dataset_name": "MoLLIST"
-  },
-  "NaF": {
-    "iso_formula": "(23Na)(19F)",
-    "dataset_name": "MoLLIST"
-  },
-  "KF": {
-    "iso_formula": "(39K)(19F)",
-    "dataset_name": "MoLLIST"
-  },
-  "AlCl": {
-    "iso_formula": "(27Al)(35Cl)",
-    "dataset_name": "MoLLIST"
-  },
-  "AlF": {
-    "iso_formula": "(27Al)(19F)",
-    "dataset_name": "MoLLIST"
-  },
-  "CaF": {
-    "iso_formula": "(40Ca)(19F)",
-    "dataset_name": "MoLLIST"
-  },
-  "MgF": {
-    "iso_formula": "(24Mg)(19F)",
-    "dataset_name": "MoLLIST"
-  },
-  "OH+": {
-    "iso_formula": "(16O)(1H)+",
-    "dataset_name": "MoLLIST"
-  },
   "AsH3": {
-    "iso_formula": "(75As)(1H)3",
+    "mol_slug": "AsH3",
+    "iso_slug": "75As-1H3",
     "dataset_name": "CYT18"
   },
   "PF3": {
-    "iso_formula": "(31P)(19F)3",
+    "mol_slug": "PF3",
+    "iso_slug": "31P-19F3",
     "dataset_name": "MCYTY"
   },
   "PH": {
-    "iso_formula": "(31P)(1H)",
+    "mol_slug": "PH",
+    "iso_slug": "31P-1H",
     "dataset_name": "LaTY"
   },
   "CH3": {
-    "iso_formula": "(12C)(1H)3",
+    "mol_slug": "CH3",
+    "iso_slug": "12C-1H3",
     "dataset_name": "AYYJ"
   },
   "SiH2": {
-    "iso_formula": "(28Si)(1H)2",
+    "mol_slug": "SiH2",
+    "iso_slug": "28Si-1H2",
     "dataset_name": "CATS"
   },
   "SiO2": {
-    "iso_formula": "(28Si)(16O)2",
+    "mol_slug": "SiO2",
+    "iso_slug": "28Si-16O2",
     "dataset_name": "OYT3"
   },
   "cis-P2H2": {
-    "iso_formula": "cis-(31P)2(1H)2",
+    "mol_slug": "cis__P2H2",
+    "iso_slug": "cis-31P2-1H2",
     "dataset_name": "OY-Cis"
   },
   "trans-P2H2": {
-    "iso_formula": "trans-(31P)2(1H)2",
+    "mol_slug": "trans__P2H2",
+    "iso_slug": "trans-31P2-1H2",
     "dataset_name": "OY-Trans"
   },
   "H3O+": {
-    "iso_formula": "(1H)3(16O)+",
+    "mol_slug": "H3O_p",
+    "iso_slug": "1H3-16O_p",
     "dataset_name": "eXeL"
   },
   "KOH": {
-    "iso_formula": "(39K)(16O)(1H)",
+    "mol_slug": "KOH",
+    "iso_slug": "39K-16O-1H",
     "dataset_name": "OYT4"
   },
   "NaOH": {
-    "iso_formula": "(23Na)(16O)(1H)",
+    "mol_slug": "NaOH",
+    "iso_slug": "23Na-16O-1H",
     "dataset_name": "OYT5"
   }
 }
