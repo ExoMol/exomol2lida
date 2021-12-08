@@ -92,7 +92,3 @@ def validate_all_inputs():
 
 def get_input(molecule_formula):
     return MoleculeInput(molecule_formula, **inputs_dict[molecule_formula])
-
-
-if __name__ == '__main__':
-    validate_all_inputs()
