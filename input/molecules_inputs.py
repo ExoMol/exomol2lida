@@ -84,7 +84,7 @@ def validate_all_inputs():
             MoleculeInput(formula, **input_dict)
             clear += 1
         except (ExomolDefParseError, MoleculeInputError, DefStatesMismatchError) as e:
-            print(f'{formula}: {e}')
+            print(f'{formula.ljust(12)}: {e}')
             with_error += 1
         total += 1
     print()
