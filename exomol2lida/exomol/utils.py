@@ -187,7 +187,7 @@ def get_num_columns(file_path):
     Returns
     -------
     int
-    
+
     Examples
     --------
     >>> get_num_columns(file_path='foo')
@@ -196,5 +196,5 @@ def get_num_columns(file_path):
     FileNotFoundError: [Errno 2] No such file or directory: 'foo'
     """
     for chunk in load_dataframe_chunks(file_path, chunk_size=1):
-        num_cols = chunk.shape[1]
-        return num_cols
+        _, num_cols = chunk.shape
+        return int(num_cols)

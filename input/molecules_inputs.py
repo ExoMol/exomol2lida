@@ -17,7 +17,7 @@ class MoleculeInputError(Exception):
     pass
 
 
-class DefStatesMismatchError(Exception):
+class ExomolDefStatesMismatchError(Exception):
     pass
 
 
@@ -63,17 +63,20 @@ class MoleculeInput:
             raise MoleculeInputError(
                 f'No .trans files found under {ds_root / trans_wc}')
 
-        self.parsed_def = parse_exomol_def(self.def_path)
+        if 'states_header' not in kwargs:
+            # states header is not explicitly specified in the input, get it from
+            # the parsed .def file:
+            parsed_def = parse_exomol_def(self.def_path)
+            self.states_header = parsed_def.get_states_header_complete()
 
-        # check if the parsed .def file aligns with the .states file in number of
+        # check if the states header aligns with the .states file in number of
         # columns in .states:
-        states_header_from_def = self.parsed_def.get_states_header_complete()
         num_columns_from_states = get_num_columns(self.states_path)
-        if len(states_header_from_def) + 1 != num_columns_from_states:
+        if len(self.states_header) + 1 != num_columns_from_states:
             msg = f'{self.states_path.name} has {num_columns_from_states} ' \
-                  f'columns, while {self.def_path.name} specifies ' \
-                  f'{len(states_header_from_def) + 1} columns.'
-            raise DefStatesMismatchError(msg)
+                  f'columns, while input or {self.def_path.name} specifies ' \
+                  f'{len(self.states_header) + 1} columns.'
+            raise ExomolDefStatesMismatchError(msg)
 
 
 def validate_all_inputs():
@@ -84,7 +87,8 @@ def validate_all_inputs():
             MoleculeInput(formula, **input_dict)
             print(f'{formula.ljust(12)}: CLEAR!')
             clear += 1
-        except (ExomolDefParseError, MoleculeInputError, DefStatesMismatchError) as e:
+        except (ExomolDefParseError, MoleculeInputError,
+                ExomolDefStatesMismatchError) as e:
             print(f'{formula.ljust(12)}: {e}')
             with_error += 1
         total += 1
