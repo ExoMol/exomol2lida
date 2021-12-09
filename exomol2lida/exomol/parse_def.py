@@ -55,8 +55,7 @@ class ExomolDef(ExomolDefBase):
     all the attributes defined in ExomolDefBase (see the namedtuple call)
     """
 
-    @property
-    def quanta_labels(self):
+    def get_quanta_labels(self):
         """
         List of quanta specified by the .def file.
 
@@ -75,17 +74,17 @@ class ExomolDef(ExomolDefBase):
         Returns
         -------
         list[str]
-            First 3 - 5 columns in the .states file as expected, the state index is
-            not counted.
+            First 4 - 6 columns in the .states file as expected, including the
+            state index.
         """
-        header = ['E', 'g_tot', 'J']
+        header = ['i', 'E', 'g_tot', 'J']
         if self.lifetime_availability:
             header.append('tau')
         if self.lande_factor_availability:
             header.append('g_J')
         return header
 
-    def get_states_header_complete(self):
+    def get_states_header(self):
         """
         List of all the columns expected in the .states file belonging to this
         .def file
@@ -95,7 +94,7 @@ class ExomolDef(ExomolDefBase):
         list[str]
             List of column names expected in the relevant .states file
         """
-        return self.get_states_header_mandatory() + self.quanta_labels
+        return self.get_states_header_mandatory() + self.get_quanta_labels()
 
 
 def _get_exomol_def_raw(
@@ -316,8 +315,11 @@ def parse_exomol_def(
     >>> type(exomol_def.isotopes[0])
     <class 'exomol2lida.exomol.parse_def.Isotope'>
 
-    >>> exomol_def.quanta_labels
+    >>> exomol_def.get_quanta_labels()
     ['par', 'v', 'N', 'e/f']
+
+    >>> exomol_def.get_states_header()
+    ['i', 'E', 'g_tot', 'J', 'tau', 'par', 'v', 'N', 'e/f']
 
     >>> parse_exomol_def(molecule_slug='foo')
     Traceback (most recent call last):

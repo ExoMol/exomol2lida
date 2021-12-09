@@ -64,15 +64,20 @@ class MoleculeInput:
             # states header is not explicitly specified in the input, get it from
             # the parsed .def file:
             parsed_def = parse_exomol_def(self.def_path)
-            self.states_header = parsed_def.get_states_header_complete()
+            self.states_header = parsed_def.get_states_header()
+        else:
+            # some basic sanitation of the states header read from input json:
+            if self.states_header[:4] != ['i', 'E', 'g_tot', 'J']:
+                raise MoleculeInputError(
+                    f'Unexpected states_header for {molecule_formula}')
 
         # check if the states header aligns with the .states file in number of
         # columns in .states:
         num_columns_from_states = get_num_columns(self.states_path)
-        if len(self.states_header) + 1 != num_columns_from_states:
+        if len(self.states_header) != num_columns_from_states:
             msg = f'{self.states_path.name} has {num_columns_from_states} ' \
                   f'columns, while input or {self.def_path.name} specifies ' \
-                  f'{len(self.states_header) + 1} columns.'
+                  f'{len(self.states_header)} columns.'
             raise ExomolDefStatesMismatchError(msg)
 
 

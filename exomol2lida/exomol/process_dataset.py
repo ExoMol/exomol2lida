@@ -16,6 +16,7 @@ class DatasetProcessor:
         ----------
         molecule_input : MoleculeInput
         """
+        self.formula = molecule_input.formula
         self.states_path = molecule_input.states_path
         self.trans_paths = molecule_input.trans_paths
         self.states_header = molecule_input.states_header
@@ -40,12 +41,13 @@ class DatasetProcessor:
         --------
         TODO: add an example loading a df from test resources and showing the cols
         """
+        assert self.states_header[0] == 'i', f'Defense on {self.formula}'
         states_chunks = load_dataframe_chunks(
             file_path=self.states_path, chunk_size=STATES_CHUNK_SIZE,
             column_names=self.states_header, index_col=0
         )
         for chunk in states_chunks:
-            if list(chunk.columns) != self.states_header:
+            if list(chunk.columns) != self.states_header[1:]:
                 raise ExomolDefStatesMismatchError(f'Defense: {self.states_path}')
             yield chunk
 
