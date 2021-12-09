@@ -1,6 +1,7 @@
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE
 from exomol2lida.exomol.utils import load_dataframe_chunks, get_num_columns
-from input.molecules_inputs import MoleculeInput, ExomolDefStatesMismatchError
+from input.molecules_inputs import (
+    MoleculeInput, ExomolDefStatesMismatchError, MoleculeInputError)
 
 
 class ExomolTransParseError(Exception):
@@ -15,11 +16,35 @@ class DatasetProcessor:
         Parameters
         ----------
         molecule_input : MoleculeInput
+            The passed object needs to implement the following interface of attributes:
+                formula : str
+                states_path : str | Path
+                trans_paths : list[str | Path]
+                states_header : list[str]
+                resolve_el: list[str], optional
+                resolve_vib: list[str], optional
+                only_with: dict[str, Any], optional
+                energy_max: number, optional
         """
+        self.molecule_input = molecule_input
+
         self.formula = molecule_input.formula
         self.states_path = molecule_input.states_path
         self.trans_paths = molecule_input.trans_paths
         self.states_header = molecule_input.states_header
+
+        self.resolve_el, self.resolve_vib = [], []
+        self.only_with, self.energy_max = {}, None
+        for attr in ['resolve_el', 'resolve_vib', 'only_with', 'energy_max']:
+            if hasattr(molecule_input, attr):
+                setattr(self, attr, getattr(molecule_input, attr))
+        if not len(self.resolve_el) and not len(self.resolve_vib):
+            raise MoleculeInputError(
+                f'Input for {self.formula} needs to implement at least one of '
+                f'"resolve_el", "resolve_vib"')
+
+        self.lumped_states = {}
+        self.states_map = {}
 
     @property
     def states_chunks(self):
@@ -86,3 +111,9 @@ class DatasetProcessor:
                 column_names=column_names)
             for chunk in trans_chunks:
                 yield chunk
+
+    def _process_states(self):
+        # TODO: get resolve_el_states, resolve_vib_states, and populate the
+        #       self.lumped_states and self.states_map dicts.
+        raise NotImplementedError
+        # TODO: start with a line-by-line implementation and work from there...
