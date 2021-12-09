@@ -9,9 +9,6 @@ from config.config import EXOMOL_DATA_DIR
 from exomol2lida.exomol.parse_def import parse_exomol_def, ExomolDefParseError
 from exomol2lida.exomol.utils import get_num_columns
 
-with open(Path(__file__).parent.joinpath('molecules.json'), 'r') as fp:
-    inputs_dict = json.load(fp)
-
 
 class MoleculeInputError(Exception):
     pass
@@ -80,6 +77,8 @@ class MoleculeInput:
 
 
 def validate_all_inputs():
+    with open(Path(__file__).parent.joinpath('molecules.json'), 'r') as fp:
+        inputs_dict = json.load(fp)
     # total counts:
     total, clear, with_error = 0, 0, 0
     for formula, input_dict in inputs_dict.items():
@@ -100,4 +99,6 @@ def validate_all_inputs():
 
 
 def get_input(molecule_formula):
+    with open(Path(__file__).parent.joinpath('molecules.json'), 'r') as fp:
+        inputs_dict = json.load(fp)
     return MoleculeInput(molecule_formula, **inputs_dict[molecule_formula])
