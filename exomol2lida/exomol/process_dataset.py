@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE
@@ -125,41 +127,62 @@ class DatasetProcessor:
             for chunk in trans_chunks:
                 yield chunk
 
-    def process_states(self):
-        lumped_states = pd.DataFrame(dtype='float64',
-                                     columns=['J', 'sum_w', 'sum_en_x_w'])
-
+    def lump_states(self):
+        lumped_states = None
         for chunk in self.states_chunks:
+            # print('raw chunk:\n', chunk)
             mask = pd.Series(True, index=chunk.index)
             for quanta, val in self.only_with.items():
                 mask = mask & (chunk[quanta] == val)
             if self.energy_max is not None:
                 mask = mask & (chunk['E'] <= self.energy_max)
             chunk = chunk.loc[mask]
+            # print('masked chunk:\n', chunk)
             chunk_grouped = chunk.groupby(self.resolved_quanta)
-            lumped_states_chunk = chunk_grouped.apply(self._process_state_group)
+            lumped_states_chunk = chunk_grouped.apply(self._process_state_lump)
+            if lumped_states is None:
+                lumped_states = lumped_states_chunk
+            # print('lumped states:\n', lumped_states)
+            # print('lumped chunk:\n', lumped_states_chunk)
             # if in the current lumped_states_chunk there is either lower-energy J
             # or a new index, I need to reset those rows in the lumped_states and
             # forget all the accumulated sum_w and sum_en_x_w
-            reset_mask = lumped_states_chunk.J.lt(lumped_states.J, fill_value='inf',
-                                                  level=len(self.resolved_quanta) - 1)
-            reset_index = reset_mask[reset_mask].index
+            add_index = lumped_states_chunk.index.difference(
+                lumped_states.index)
+            # print('add_index:\n', add_index)
+            index_intersection = lumped_states_chunk.index.intersection(
+                lumped_states.index)
+            # print('index_intersection:\n', index_intersection)
+            reset_mask = lumped_states_chunk.J.loc[index_intersection].lt(
+                lumped_states.J.loc[index_intersection])
+            reset_index = reset_mask.loc[reset_mask].index
+            reset_index = reset_index.union(add_index, sort=False)
+            # print('reset_index:\n', reset_index)
             # looks like I need to create temp. dataframe with union of the indices
             lumped_states_updated = pd.DataFrame(
                 dtype='float64', columns=lumped_states.columns,
-                index=lumped_states.index.union(reset_index))
+                index=reset_index.union(lumped_states.index, sort=False))
+            lumped_states_updated.loc[lumped_states.index] = lumped_states
+            # print('lumped states updated (initialised)\n', lumped_states_updated)
             # and reset the values:
             lumped_states_updated.loc[reset_index, 'J'] = \
                 lumped_states_chunk.loc[reset_index, 'J']
+            # print('lumped states updated (reset)\n', lumped_states_updated)
             lumped_states_updated.loc[reset_index, ['sum_w', 'sum_en_x_w']] = [0, 0]
             # now to update the sum_w and sum_en_x_w accumulates
-            update_mask = lumped_states_updated.J.eq(lumped_states_chunk.J)
-            lumped_states_updated.loc[update_mask, ['sum_w', 'sum_en_x_w']] = \
-                lumped_states_updated.loc[update_mask, ['sum_w', 'sum_en_x_w']].add(
-                    lumped_states_chunk.loc[update_mask, ['sum_w', 'sum_en_x_w']]
+            index_intersection = lumped_states_updated.index.intersection(
+                lumped_states_chunk.index)
+            update_mask = lumped_states_updated.J.loc[index_intersection].eq(
+                lumped_states_chunk.J.loc[index_intersection])
+            update_index = update_mask.loc[update_mask].index
+            lumped_states_updated.loc[update_index, ['sum_w', 'sum_en_x_w']] = \
+                lumped_states_updated.loc[update_index, ['sum_w', 'sum_en_x_w']].add(
+                    lumped_states_chunk.loc[update_index, ['sum_w', 'sum_en_x_w']]
                 )
+            # print('lumped states updated (final)\n', lumped_states_updated)
             # and get rid of the temp. dataframe
             lumped_states = lumped_states_updated
+            # print(100 * '#')
 
         # calculate the energy weighted average and get rid of temp. columns
         lumped_states['E'] = round(lumped_states.sum_en_x_w / lumped_states.sum_w, 5)
@@ -167,7 +190,7 @@ class DatasetProcessor:
         # and save the result as an instance attribute
         self.lumped_states = lumped_states
 
-    def _process_state_group(self, df):
+    def _process_state_lump(self, df):
         # this is applied on a dataframe of a group (lump) of states which all share
         # the same values of the resolved quanta
 
@@ -196,7 +219,7 @@ if __name__ == '__main__':
     mol_processor = DatasetProcessor(mol_input)
 
     t0 = time()
-    mol_processor.process_states()
+    mol_processor.lump_states()
 
     # print(mol_processor.states_map_lumped_to_original)
 
