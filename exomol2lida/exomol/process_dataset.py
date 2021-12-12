@@ -82,12 +82,11 @@ class DatasetProcessor:
         assert self.states_header[0] == 'i', f'Defense on {self.formula}'
         states_chunks = load_dataframe_chunks(
             file_path=self.states_path, chunk_size=STATES_CHUNK_SIZE,
-            column_names=self.states_header, index_col=0
+            column_names=self.states_header, index_col=0, dtype=str
         )
         for chunk in states_chunks:
             if list(chunk.columns) != self.states_header[1:]:
                 raise ExomolDefStatesMismatchError(f'Defense: {self.states_path}')
-            chunk = chunk.astype(str)
             chunk.loc[:, 'J'] = chunk.loc[:, 'J'].astype('float64')
             chunk.loc[:, 'E'] = chunk.loc[:, 'E'].astype('float64')
             chunk.loc[:, 'g_tot'] = chunk.loc[:, 'g_tot'].astype('float64')

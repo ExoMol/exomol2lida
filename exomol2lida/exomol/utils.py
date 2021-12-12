@@ -138,7 +138,8 @@ on line 4 in foo
     return val
 
 
-def load_dataframe_chunks(file_path, chunk_size, column_names=None, index_col=None):
+def load_dataframe_chunks(
+        file_path, chunk_size, column_names=None, index_col=None, dtype=None):
     """
     Loads chunks of either .states.bz2 file or .trans.bz2 file, with specified
     chunk size.
@@ -153,6 +154,8 @@ def load_dataframe_chunks(file_path, chunk_size, column_names=None, index_col=No
         column names of the file loaded. Without the index column, if specified
     index_col : int, optional
         index column number, None by default.
+    dtype : type, optional
+        data type to cast to pd.read_csv
 
     Returns
     -------
@@ -170,7 +173,8 @@ def load_dataframe_chunks(file_path, chunk_size, column_names=None, index_col=No
     """
     df_chunks = pd.read_csv(
         file_path, compression='bz2', sep=r'\s+', header=None, index_col=index_col,
-        names=column_names, chunksize=chunk_size, iterator=True, low_memory=False
+        names=column_names, chunksize=chunk_size, iterator=True, low_memory=False,
+        dtype=dtype
     )
     return df_chunks
 
