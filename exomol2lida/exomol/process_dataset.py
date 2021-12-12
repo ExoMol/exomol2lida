@@ -150,13 +150,13 @@ class DatasetProcessor:
                     index=lumped_states_chunk.index,
                     columns=lumped_states_chunk.columns, dtype='float64')
                 lumped_states.loc[:, 'J'] = float('inf')
-            # if in the current lumped_states_chunk there is either lower-energy J
+            # if in the current lumped_states_chunk there is either  J
             # or a new index, I need to reset those rows in the lumped_states and
             # forget all the accumulated sum_w and sum_en_x_w...
             # new index:
             add_index = lumped_states_chunk.index.difference(
                 lumped_states.index)
-            # index of lower-energy Js:
+            # index of lower Js:
             index_intersection = lumped_states_chunk.index.intersection(
                 lumped_states.index)
             reset_mask = lumped_states_chunk.J.loc[index_intersection].lt(
@@ -203,14 +203,14 @@ class DatasetProcessor:
         self.states_map_original_to_lumped.update(
             {i: lumped_state for i in df.index})
 
-        # now calculate the lumped state attributes
-        min_en_j = df.loc[df.E == df.E.min(), 'J'].values[0]
+        # now calculate the lumped state attributes:
         # energy is calculated as the average of energies over the states with
-        # lowest-energy J, weighted by the total degeneracy
-        sub_df = df.loc[df.J == min_en_j]
+        # lowest J, weighted by the total degeneracy
+        j_min = df.J.min()
+        sub_df = df.loc[df.J == j_min]
         sub_df['en_x_w'] = sub_df.E * sub_df.g_tot
         sum_w, sum_en_x_w = sub_df[['g_tot', 'en_x_w']].sum(axis=0).values
-        return pd.Series([min_en_j, sum_w, sum_en_x_w],
+        return pd.Series([j_min, sum_w, sum_en_x_w],
                          index=['J', 'sum_w', 'sum_en_x_w'], dtype='float64')
 
 
