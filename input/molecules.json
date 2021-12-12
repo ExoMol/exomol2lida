@@ -57,7 +57,10 @@
   "HCN": {
     "mol_slug": "HCN",
     "iso_slug": "1H-12C-14N",
-    "dataset_name": "Harris"
+    "dataset_name": "Harris",
+    "resolve_vib": ["v1", "v2", "v3"],
+    "energy_max": 10000,
+    "only_with": {"+/-":  "+"}
   },
   "CH3Cl": {
     "mol_slug": "CH3Cl",
