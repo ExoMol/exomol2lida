@@ -1,21 +1,17 @@
 # TODO: Write some docstrings and doctests, should be detailed that MoleculeInput
 #       class does all sorts of verification. Cleanly instantiated MoleculeInput
 #       should be directly runnable to process the ExoMol data and get outputs.
+# Supplying the "states_header" attribute for a molecule will completely bypass the
+# .def file parser
 
 import json
 from pathlib import Path
 
 from config.config import EXOMOL_DATA_DIR
-from exomol2lida.exomol.parse_def import parse_exomol_def, ExomolDefParseError
+from exomol2lida.exomol.parse_def import parse_exomol_def
 from exomol2lida.exomol.utils import get_num_columns
-
-
-class MoleculeInputError(Exception):
-    pass
-
-
-class ExomolDefStatesMismatchError(Exception):
-    pass
+from exceptions import (
+    MoleculeInputError, TransParseError, StatesParseError, DefParseError)
 
 
 class MoleculeInput:
@@ -78,7 +74,14 @@ class MoleculeInput:
             msg = f'{self.states_path.name} has {num_columns_from_states} ' \
                   f'columns, while input or {self.def_path.name} specifies ' \
                   f'{len(self.states_header)} columns.'
-            raise ExomolDefStatesMismatchError(msg)
+            raise StatesParseError(msg)
+
+        # finally, check if the .trans file has the appropriate number of columns:
+        num_columns_trans = get_num_columns(self.trans_paths[0])
+        if num_columns_trans not in {3, 4}:
+            msg = f'{self.trans_paths[0].name} has {num_columns_trans} ' \
+                  f'columns, while 3 or 4 columns are expected!'
+            raise TransParseError(msg)
 
 
 def validate_all_inputs():
@@ -91,8 +94,8 @@ def validate_all_inputs():
             MoleculeInput(formula, **input_dict)
             print(f'{formula.ljust(12)}: CLEAR!')
             clear += 1
-        except (ExomolDefParseError, MoleculeInputError,
-                ExomolDefStatesMismatchError) as e:
+        except (DefParseError, MoleculeInputError,
+                StatesParseError) as e:
             print(f'{formula.ljust(12)}: {e}')
             with_error += 1
         total += 1

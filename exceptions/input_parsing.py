@@ -1,0 +1,2 @@
+class MoleculeInputError(Exception):
+    pass

@@ -2,12 +2,8 @@ import pandas as pd
 
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE
 from exomol2lida.exomol.utils import load_dataframe_chunks, get_num_columns
-from input.molecules_inputs import (
-    MoleculeInput, ExomolDefStatesMismatchError, MoleculeInputError)
-
-
-class ExomolTransParseError(Exception):
-    pass
+from input.molecules_inputs import MoleculeInput
+from exceptions import MoleculeInputError, StatesParseError, TransParseError
 
 
 class DatasetProcessor:
@@ -86,7 +82,7 @@ class DatasetProcessor:
         )
         for chunk in states_chunks:
             if list(chunk.columns) != self.states_header[1:]:
-                raise ExomolDefStatesMismatchError(f'Defense: {self.states_path}')
+                raise StatesParseError(f'Defense: {self.states_path}')
             chunk.loc[:, 'J'] = chunk.loc[:, 'J'].astype('float64')
             chunk.loc[:, 'E'] = chunk.loc[:, 'E'].astype('float64')
             chunk.loc[:, 'g_tot'] = chunk.loc[:, 'g_tot'].astype('float64')
@@ -117,7 +113,7 @@ class DatasetProcessor:
         if num_cols == 4:
             column_names.append('v_if')
         elif num_cols != 3:
-            raise ExomolTransParseError(
+            raise TransParseError(
                 f'Unexpected number of columns in '
                 f'{self.trans_paths[0].name}: {num_cols}')
         # yield all the chunks:

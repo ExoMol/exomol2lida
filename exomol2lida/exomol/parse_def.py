@@ -4,16 +4,12 @@ from pathlib import Path
 import requests
 from pyvalem.formula import Formula, FormulaParseError
 
-from exomol2lida.exomol.utils import (
-    parse_exomol_line, ExomolLineValueError, ExomolLineCommentError)
+from exomol2lida.exomol.utils import parse_exomol_line
+from exceptions import LineValueError, LineCommentError, DefParseError
 
 file_dir = Path(__file__).parent.resolve()
 project_dir = file_dir.parent.parent
 test_resources = project_dir.joinpath('test', 'resources')
-
-
-class ExomolDefParseError(Exception):
-    pass
 
 
 ExomolDefBase = namedtuple(
@@ -185,10 +181,10 @@ def _parse_exomol_def_raw(exomol_def_raw, file_name, raise_warnings=True):
         try:
             formula = Formula(kwargs['iso_formula'])
         except FormulaParseError as e:
-            raise ExomolDefParseError(f'{str(e)} (raised in {file_name})')
+            raise DefParseError(f'{str(e)} (raised in {file_name})')
         if formula.natoms != num_atoms:
             ds_name = f'{kwargs["iso_slug"]}__{kwargs["dataset_name"]}.def'
-            raise ExomolDefParseError(
+            raise DefParseError(
                 f'Incorrect number of atoms in {ds_name}'
             )
         for i in range(num_atoms):
@@ -258,8 +254,8 @@ def _parse_exomol_def_raw(exomol_def_raw, file_name, raise_warnings=True):
         })
 
         return ExomolDef(**kwargs)
-    except (ExomolLineValueError, ExomolLineCommentError) as e:
-        raise ExomolDefParseError(str(e))
+    except (LineValueError, LineCommentError) as e:
+        raise DefParseError(str(e))
 
 
 def parse_exomol_def(

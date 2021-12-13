@@ -3,13 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-
-class ExomolLineCommentError(Exception):
-    pass
-
-
-class ExomolLineValueError(Exception):
-    pass
+from exceptions import LineValueError, LineCommentError
 
 
 def parse_exomol_line(
@@ -84,14 +78,14 @@ def parse_exomol_line(
     >>> parse_exomol_line(lns, n, file_name='C60.def')
     Traceback (most recent call last):
       ...
-    exomol2lida.exomol.utils.ExomolLineCommentError: Unexpected line format detected \
+    exceptions.line_parsing.LineCommentError: Unexpected line format detected \
 on line 3 in C60.def
 
     >>> parse_exomol_line(
     ...     lns, n, expected_comment='comment4', file_name='foo', val_type=int)
     Traceback (most recent call last):
       ...
-    exomol2lida.exomol.utils.ExomolLineValueError: Unexpected value type detected \
+    exceptions.line_parsing.LineValueError: Unexpected value type detected \
 on line 4 in foo
 
     >>> lns
@@ -105,7 +99,7 @@ on line 4 in foo
             msg = f'Run out of lines'
             if file_name:
                 msg += f' in {file_name}'
-            raise ExomolLineValueError(msg)
+            raise LineValueError(msg)
         line_num = n_orig - len(lines)
         if line:
             break
@@ -121,7 +115,7 @@ on line 4 in foo
         msg = f'Unexpected line format detected on line {line_num}'
         if file_name:
             msg += f' in {file_name}'
-        raise ExomolLineCommentError(msg)
+        raise LineCommentError(msg)
     if val_type:
         try:
             val = val_type(val)
@@ -129,7 +123,7 @@ on line 4 in foo
             msg = f'Unexpected value type detected on line {line_num}'
             if file_name:
                 msg += f' in {file_name}'
-            raise ExomolLineValueError(msg)
+            raise LineValueError(msg)
     if comment != expected_comment and raise_warnings:
         msg = f'Unexpected comment detected on line {line_num}!'
         if file_name:
