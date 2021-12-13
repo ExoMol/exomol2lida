@@ -42,11 +42,17 @@ class DatasetProcessor:
                 f'Input for {self.formula} needs to implement at least one of '
                 f'"resolve_el", "resolve_vib"')
         # some verification on the passed parameters
-        for name, quanta in zip(['resolve_el', 'resolve_vib', 'only_with'],
-                                [self.resolve_el, self.resolve_vib, self.only_with]):
+        for name, quanta in zip(['resolve_el', 'resolve_vib'],
+                                [self.resolve_el, self.resolve_vib]):
+            # resolve_el and resolve_vib need to be subsets of quanta names
             if not set(quanta).issubset(self.states_header[4:]):
                 raise MoleculeInputError(
-                    f'Unrecognised {name} passed: {quanta} not among states columns.')
+                    f'Unrecognised "{name}" passed: {quanta} not among states columns.')
+        # "only_with" keys need to be subset of quanta nad J
+        if not set(self.only_with).issubset(self.states_header[3:]):
+            raise MoleculeInputError(
+                f'Unrecognised "only_with" passed: {self.only_with} not among '
+                f'states columns.')
         if self.energy_max is not None:
             self.energy_max = float(self.energy_max)
         self.resolved_quanta = self.resolve_el + self.resolve_vib
@@ -146,7 +152,7 @@ class DatasetProcessor:
                 lumped_states = pd.DataFrame(
                     index=lumped_states_chunk.index,
                     columns=lumped_states_chunk.columns, dtype='float64')
-                lumped_states.loc[:, 'J'] = float('inf')
+                lumped_states.loc[:, 'J_en'] = float('inf')
             # if in the current lumped_states_chunk there is either  J
             # or a new index, I need to reset those rows in the lumped_states and
             # forget all the accumulated sum_w and sum_en_x_w...
@@ -156,8 +162,8 @@ class DatasetProcessor:
             # index of lower Js:
             index_intersection = lumped_states_chunk.index.intersection(
                 lumped_states.index)
-            reset_mask = lumped_states_chunk.J.loc[index_intersection].lt(
-                lumped_states.J.loc[index_intersection])
+            reset_mask = lumped_states_chunk.J_en.loc[index_intersection].lt(
+                lumped_states.J_en.loc[index_intersection])
             reset_index = reset_mask.loc[reset_mask].index
             # all indices to reset:
             reset_index = reset_index.union(add_index, sort=False)
@@ -167,14 +173,14 @@ class DatasetProcessor:
                 columns=lumped_states.columns, dtype='float64')
             lumped_states_updated.loc[lumped_states.index] = lumped_states
             # and reset the values:
-            lumped_states_updated.loc[reset_index, 'J'] = \
-                lumped_states_chunk.loc[reset_index, 'J']
+            lumped_states_updated.loc[reset_index, 'J_en'] = \
+                lumped_states_chunk.loc[reset_index, 'J_en']
             lumped_states_updated.loc[reset_index, ['sum_w', 'sum_en_x_w']] = [0, 0]
             # now to update the sum_w and sum_en_x_w accumulates
             index_intersection = lumped_states_updated.index.intersection(
                 lumped_states_chunk.index)
-            update_mask = lumped_states_updated.J.loc[index_intersection].eq(
-                lumped_states_chunk.J.loc[index_intersection])
+            update_mask = lumped_states_updated.J_en.loc[index_intersection].eq(
+                lumped_states_chunk.J_en.loc[index_intersection])
             update_index = update_mask.loc[update_mask].index
             lumped_states_updated.loc[update_index, ['sum_w', 'sum_en_x_w']] = \
                 lumped_states_updated.loc[update_index, ['sum_w', 'sum_en_x_w']].add(
@@ -182,9 +188,32 @@ class DatasetProcessor:
             # and get rid of the temp. dataframe
             lumped_states = lumped_states_updated
 
-        # calculate the energy weighted average and get rid of temp. columns
+        # calculate the energy weighted average
         lumped_states['E'] = (lumped_states.sum_en_x_w / lumped_states.sum_w).round(5)
-        lumped_states = lumped_states.drop(columns=['sum_w', 'sum_en_x_w'])
+        # clean up the column names, remove temporary columns
+        lumped_states['J(E)'] = lumped_states['J_en']
+        lumped_states.drop(columns=['J_en', 'sum_w', 'sum_en_x_w'], inplace=True)
+        # add a column with lump size:
+        lumped_states.loc[:, 'lump_size'] = [
+            len(self.states_map_lumped_to_original[lumped_i])
+            for lumped_i in lumped_states.index]
+        lumped_states.sort_values(by='E', inplace=True)
+
+        # flatten the lumped_states multiindex into columns and reset index
+        # each lumped state will get it's own integer index
+        lumped_index_orig = list(lumped_states.index)
+        lumped_states.reset_index(inplace=True)
+        lumped_index_update_map = dict(zip(lumped_index_orig, lumped_states.index))
+        self.states_map_lumped_to_original = {
+            lumped_index_update_map[key]: val
+            for key, val in self.states_map_lumped_to_original.items()
+        }
+
+        # populate the forward map from the original index to the lumped index:
+        for lumped_i, original_indices in self.states_map_lumped_to_original.items():
+            self.states_map_original_to_lumped.update(
+                {i: lumped_i for i in original_indices})
+
         # and save the result as an instance attribute
         self.lumped_states = lumped_states
 
@@ -204,13 +233,12 @@ class DatasetProcessor:
         # this is applied on a dataframe of a group (lump) of states which all share
         # the same values of the resolved quanta
 
-        # first record the lump into the states_map dicts:
+        # first record the lump into the states_map dict:
         lumped_state = tuple(df.iloc[0].loc[self.resolved_quanta])
+        # lumped_state tuple will also be the new MultiIndex value after grouping
         if lumped_state not in self.states_map_lumped_to_original:
             self.states_map_lumped_to_original[lumped_state] = set()
         self.states_map_lumped_to_original[lumped_state].update(df.index)
-        self.states_map_original_to_lumped.update(
-            {i: lumped_state for i in df.index})
 
         # now calculate the lumped state attributes:
         # energy is calculated as the average of energies over the states with
@@ -220,7 +248,7 @@ class DatasetProcessor:
         sub_df['en_x_w'] = sub_df.E * sub_df.g_tot
         sum_w, sum_en_x_w = sub_df[['g_tot', 'en_x_w']].sum(axis=0).values
         return pd.Series([j_min, sum_w, sum_en_x_w],
-                         index=['J', 'sum_w', 'sum_en_x_w'], dtype='float64')
+                         index=['J_en', 'sum_w', 'sum_en_x_w'], dtype='float64')
 
 
 if __name__ == '__main__':
@@ -234,4 +262,22 @@ if __name__ == '__main__':
     mol_processor.lump_states()
     print(f'Process time: {time() - t0}')
 
-    print(mol_processor.lumped_states.sort_values('E'))
+    print(mol_processor.lumped_states)
+
+    # case = 1
+    # with open(f'output/lumped_states_{case}.csv', 'w') as fp:
+    #     mol_processor.lumped_states.to_csv(fp)
+    #
+    # forward_map = mol_processor.states_map_original_to_lumped
+    # with open(f'output/forward_map_{case}.py', 'w') as fp:
+    #     print('states_map_original_to_lumped = {', file=fp)
+    #     for map_i in sorted(forward_map):
+    #         print(f'    {map_i}: {forward_map[map_i]}, ', file=fp)
+    #     print('}', file=fp)
+    #
+    # backward_map = mol_processor.states_map_lumped_to_original
+    # with open(f'output/backward_map_{case}.py', 'w') as fp:
+    #     print('states_map_lumped_to_original = {', file=fp)
+    #     for map_i in sorted(backward_map):
+    #         print(f'    {map_i}: {sorted(backward_map[map_i])}, ', file=fp)
+    #     print('}', file=fp)
