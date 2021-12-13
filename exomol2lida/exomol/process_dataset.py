@@ -55,6 +55,8 @@ class DatasetProcessor:
         self.states_map_lumped_to_original = {}
         self.states_map_original_to_lumped = {}
 
+        self.lumped_transitions = None
+
     @property
     def states_chunks(self):
         """
@@ -185,6 +187,18 @@ class DatasetProcessor:
         lumped_states = lumped_states.drop(columns=['sum_w', 'sum_en_x_w'])
         # and save the result as an instance attribute
         self.lumped_states = lumped_states
+
+    def lump_transitions(self):
+        for chunk in self.trans_chunks:
+            # add columns mapping initial and final states on to the lumped states
+            chunk['lumped_i'] = chunk.i.transform(
+                lambda i: self.states_map_original_to_lumped.get(i, None))
+            chunk['lumped_f'] = chunk.f.transform(
+                lambda f: self.states_map_original_to_lumped.get(f, None))
+            # get rid of all the transitions from or to a non-existing lumped state
+            chunk = chunk.dropna(axis='rows')
+            # get rid of all the transitions within the same lumped state
+            chunk = chunk.loc[chunk.lumped_i != chunk.lumped_f]
 
     def _process_state_lump(self, df):
         # this is applied on a dataframe of a group (lump) of states which all share
