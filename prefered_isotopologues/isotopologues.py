@@ -1,8 +1,11 @@
+"""
+A module with functionality to determine a "preferred isotopologue" for any molecular
+formula.
+"""
+
 from pyvalem.formula import Formula
 
-from exomol2lida.isotopologues.atomic_isotope_abundances import (
-    get_nist_isotopes_abundances
-)
+from .atomic_isotope_abundances import get_nist_isotopes_abundances
 
 
 def get_preferred_isotopologue(molecule_formula):
@@ -34,18 +37,18 @@ def get_preferred_isotopologue(molecule_formula):
     """
 
     formula = Formula(molecule_formula)
-    iso_formula = ''
-    if molecule_formula.startswith('cis-'):
-        iso_formula += 'cis-'
-    elif molecule_formula.startswith('trans-'):
-        iso_formula += 'trans-'
+    iso_formula = ""
+    if molecule_formula.startswith("cis-"):
+        iso_formula += "cis-"
+    elif molecule_formula.startswith("trans-"):
+        iso_formula += "trans-"
     for atom, stoich in formula.atom_stoich.items():
         iso_formula += get_nist_isotopes_abundances()[atom][0][0]
         if stoich > 1:
             iso_formula += str(stoich)
     if formula.charge:
         assert formula.charge == 1
-        iso_formula += '+'
+        iso_formula += "+"
     # validation of the name:
     Formula(iso_formula)
 

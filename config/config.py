@@ -1,10 +1,11 @@
 from pathlib import Path
+
 file_dir = Path(__file__).parent
 project_root = file_dir.parent
 
 # ********************************** PATHS ******************************************* #
-INPUT_DIR = project_root / 'input'
-OUTPUT_DIR = project_root / 'output'
+INPUT_DIR = project_root / "input"
+OUTPUT_DIR = project_root / "output"
 EXOMOL_DATA_DIR = None
 
 # ******************************* PROCESSING ***************************************** #
@@ -17,4 +18,4 @@ ENERGY_MAX = 1_000
 
 # ****************************** LOCAL CONFIG **************************************** #
 # load the local config:
-from config.config_local import *
+from .config_local import *
