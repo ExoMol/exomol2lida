@@ -235,7 +235,7 @@ def get_input(molecule_formula, input_json_path):
     return MoleculeInput(molecule_formula, **inputs_dict[molecule_formula])
 
 
-def get_all_inputs(input_json_path, bypass_exceptions=False):
+def get_all_inputs(input_json_path, bypass_exceptions=False, verbose=True):
     """Get the ``MoleculeInput`` instances for all formulas specified in the input
     json file.
 
@@ -243,6 +243,7 @@ def get_all_inputs(input_json_path, bypass_exceptions=False):
     ----------
     input_json_path : str or Path
     bypass_exceptions : bool, optional
+    verbose : bool, optional
 
     Returns
     -------
@@ -263,9 +264,12 @@ def get_all_inputs(input_json_path, bypass_exceptions=False):
             except (MoleculeInputError, DefParseError) as e:
                 num_exceptions_raised += 1
                 mol_input = None
-                print(f"{molecule_formula}: {e}")
-        all_inputs[molecule_formula] = mol_input
-    if bypass_exceptions and num_exceptions_raised:
+                if verbose:
+                    print(f"{molecule_formula}: {e}")
+        if mol_input is not None:
+            all_inputs[molecule_formula] = mol_input
+    if bypass_exceptions and num_exceptions_raised and verbose:
         print(
             f"{num_exceptions_raised}/{len(inputs_dict)} inconsistent inputs detected"
         )
+    return all_inputs
