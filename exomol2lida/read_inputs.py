@@ -153,7 +153,7 @@ class MoleculeInput:
         if self.states_header is None:
             # states header is not explicitly specified in the input, get it from
             # the parsed .def file:
-            self.def_parser = DefParser(self.states_path)
+            self.def_parser = DefParser(self.def_path)
             self.def_parser.parse(warn_on_comments=False)
             self.states_header = ["i", "E", "g_tot", "J"]
             if self.def_parser.lifetime_availability:
