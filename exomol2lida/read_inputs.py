@@ -82,7 +82,9 @@ class MoleculeInput:
     def_path : Path
     states_path : Path
     trans_paths : list[Path]
-    def_parser : DefParser, optional
+    def_parser : DefParser
+    def_parser_raised : Exception, optional
+    version : int
 
     Raises
     ------
@@ -92,6 +94,9 @@ class MoleculeInput:
 
     def __init__(self, molecule_formula, **kwargs):
         self.formula = molecule_formula
+        self.def_parser = None
+        self.def_parser_raised = None
+        self.version = None
 
         # stubs for all the arguments which might be expected:
         self.mol_slug = None
@@ -102,7 +107,6 @@ class MoleculeInput:
         self.resolve_vib = []
         self.energy_max = float("inf")
         self.only_with = {}
-        self.def_parser = None
 
         # populate the attributes:
         for attr, val in kwargs.items():
@@ -149,24 +153,42 @@ class MoleculeInput:
                 f"No .trans files found under {ds_root / trans_wc}"
             )
 
+        # try to parse the .def file as far as I can get. Need the version and possibly
+        # also the states_header, if not supplied by the input json.
+        self.def_parser = DefParser(self.def_path)
+        try:
+            self.def_parser.parse(warn_on_comments=False)
+        except DefParseError as e:
+            self.def_parser_raised = e
+        if self.def_parser.version is not None:
+            self.version = self.def_parser.version
+        else:
+            raise self.def_parser_raised
+
         # get .states column names:
-        if self.states_header is None:
+        if self.states_header is not None:
+            # some basic sanitation of the states header read from input json:
+            if self.states_header[:4] != ["i", "E", "g_tot", "J"]:
+                raise MoleculeInputError(
+                    f"Unexpected states_header for {molecule_formula}"
+                )
+        else:
             # states header is not explicitly specified in the input, get it from
             # the parsed .def file:
-            self.def_parser = DefParser(self.def_path)
-            self.def_parser.parse(warn_on_comments=False)
+            if self.def_parser.quanta is None:
+                # I need the quanta and few attributes before quanta to construct the
+                # states header. If they are not there, that means the DefParser did
+                # not finish cleanly.
+                raise self.def_parser_raised
+            assert self.def_parser.lifetime_availability is not None, 'Defense'
+            assert self.def_parser.lande_factor_availability is not None, 'Defense'
             self.states_header = ["i", "E", "g_tot", "J"]
             if self.def_parser.lifetime_availability:
                 self.states_header.append("tau")
             if self.def_parser.lande_factor_availability:
                 self.states_header.append("g_J")
             self.states_header.extend(self.def_parser.get_quanta_labels())
-        else:
-            # some basic sanitation of the states header read from input json:
-            if self.states_header[:4] != ["i", "E", "g_tot", "J"]:
-                raise MoleculeInputError(
-                    f"Unexpected states_header for {molecule_formula}"
-                )
+
         # resolve_el and resolve_vib must not share any states:
         if set(self.resolve_el).intersection(self.resolve_vib):
             raise MoleculeInputError(
