@@ -16,7 +16,7 @@ The *molecules.json* is expected to hold the following entries:
 
 ``molecule_formula``: Identifier for the Lida database, does not have to correspond
     to the ``mol_slug`` or ``iso_slug``. For example "HD+" might be used
-    instead of "H2+".
+    instead of "H2+". Must be, however, parsable by PyValem package.
 ``mol_slug``, ``iso_slug``, ``dataset_name``: Mandatory attributes for each
     ``molecule_formula``, these three attributes will determine where to look for the
     data inside the ``EXOMOL_DATA_DIR``.
@@ -71,6 +71,7 @@ class MoleculeInput:
     Attributes
     ----------
     formula : str
+    iso_formula : str
     mol_slug : str
     iso_slug : str
     dataset_name : str
@@ -85,6 +86,7 @@ class MoleculeInput:
     def_parser : DefParser
     def_parser_raised : Exception, optional
     version : int
+    mass : float
 
     Raises
     ------
@@ -153,17 +155,23 @@ class MoleculeInput:
                 f"No .trans files found under {ds_root / trans_wc}"
             )
 
-        # try to parse the .def file as far as I can get. Need the version and possibly
-        # also the states_header, if not supplied by the input json.
+        # try to parse the .def file as far as I can get.
         self.def_parser = DefParser(self.def_path)
         try:
             self.def_parser.parse(warn_on_comments=False)
         except DefParseError as e:
             self.def_parser_raised = e
-        if self.def_parser.version is not None:
-            self.version = self.def_parser.version
-        else:
+        # We will need some data from the .def file for the outputs:
+        if (
+            self.def_parser.iso_formula is None
+            or self.def_parser.version is None
+            or self.def_parser.mass is None
+        ):
             raise self.def_parser_raised
+        else:
+            self.iso_formula = self.def_parser.iso_formula
+            self.version = self.def_parser.version
+            self.mass = self.def_parser.mass
 
         # get .states column names:
         if self.states_header is not None:
@@ -180,8 +188,8 @@ class MoleculeInput:
                 # states header. If they are not there, that means the DefParser did
                 # not finish cleanly.
                 raise self.def_parser_raised
-            assert self.def_parser.lifetime_availability is not None, 'Defense'
-            assert self.def_parser.lande_factor_availability is not None, 'Defense'
+            assert self.def_parser.lifetime_availability is not None, "Defense"
+            assert self.def_parser.lande_factor_availability is not None, "Defense"
             self.states_header = ["i", "E", "g_tot", "J"]
             if self.def_parser.lifetime_availability:
                 self.states_header.append("tau")
@@ -192,27 +200,39 @@ class MoleculeInput:
         # resolve_el and resolve_vib must not share any states:
         if set(self.resolve_el).intersection(self.resolve_vib):
             raise MoleculeInputError(
-                f"Common values found in 'resolve_el' and 'resolve_vib'!"
+                f"Common values found in 'resolve_el' and 'resolve_vib' for "
+                f"{molecule_formula}."
             )
         resolved_quanta = set(self.resolve_el + self.resolve_vib)
         # only states might be in resolve_vib and resolve_el:
         if resolved_quanta.intersection(["i", "E", "g_tot", "J", "tau", "g_J"]):
             raise MoleculeInputError(
-                f"Unsupported values found in 'resolve_el' or 'resolve_vib'!"
+                f"Unsupported values found in 'resolve_el' or 'resolve_vib' for "
+                f"{molecule_formula}."
             )
         quanta_available = set(self.states_header).difference(
             ["i", "E", "g_tot", "J", "tau", "g_J"]
         )
         if not resolved_quanta.issubset(quanta_available):
             raise MoleculeInputError(
-                f"Unsupported values found in 'resolve_el' or 'resolve_vib'!"
+                f"Unsupported values found in 'resolve_el' or 'resolve_vib' for "
+                f"{molecule_formula}."
             )
         # "only_with" keys need to be subset of quanta nad J
         if not set(self.only_with).issubset(quanta_available | {"J"}):
             raise MoleculeInputError(
-                f'Unrecognised "only_with" passed: {self.only_with} not among '
-                f"quanta available."
+                f"Unrecognised 'only_with': {self.only_with} not among "
+                f"quanta available in {self.dataset_name}."
             )
+        # isomers failsafe: if "iso" among quanta, it needs to be either resolved, or
+        # filtered via only_with parameter, so different isomers are not lumped
+        if "iso" in quanta_available:
+            if "iso" not in self.only_with and "iso" not in resolved_quanta:
+                raise MoleculeInputError(
+                    f"Cannot lump over 'iso' states. Isomers need to be either "
+                    f"resolved or filtered with 'only_with' parameter for "
+                    f"{molecule_formula}"
+                )
 
         # check if the states header aligns with the .states file in number of
         # columns in .states:

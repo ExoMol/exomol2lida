@@ -61,6 +61,13 @@
     "resolve_vib": ["v1", "v2", "v3"],
     "only_with": {"iso":  "0"}
   },
+  "HNC": {
+    "mol_slug": "HCN",
+    "iso_slug": "1H-12C-14N",
+    "dataset_name": "Harris",
+    "resolve_vib": ["v1", "v2", "v3"],
+    "only_with": {"iso":  "1"}
+  },
   "CH3Cl": {
     "mol_slug": "CH3Cl",
     "iso_slug": "12C-1H3-35Cl",

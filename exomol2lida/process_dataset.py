@@ -19,6 +19,8 @@ class DatasetProcessor:
     molecule_input : MoleculeInput
     """
 
+    discarded_quanta_values = {"*"}
+
     def __init__(self, molecule_input):
         self.formula = molecule_input.formula
         self.states_path = molecule_input.states_path
@@ -97,8 +99,11 @@ class DatasetProcessor:
         for chunk in self.states_chunks:
             # initial filtering
             mask = pd.Series(True, index=chunk.index)
-            for quanta, val in self.only_with.items():
-                mask = mask & (chunk[quanta] == val)
+            for quantum, val in self.only_with.items():
+                mask = mask & (chunk[quantum] == val)
+            for quantum in self.resolved_quanta:
+                for val in self.discarded_quanta_values:
+                    mask = mask & (chunk[quantum] != val)
             if self.energy_max is not None:
                 mask = mask & (chunk["E"] <= self.energy_max)
             chunk = chunk.loc[mask]
@@ -193,7 +198,9 @@ class DatasetProcessor:
         for chunk in self.trans_chunks:
             if "v_if" in chunk:
                 chunk.drop(columns=["v_if"])
-            print(chunk)
+            # TODO: as the trans chunks will likely be very large, it is better to
+            #       create new masks/filtering series, rather than adding columns to
+            #       the trans chunks!
             # add columns mapping initial and final states on to the lumped states
             chunk["lumped_i"] = chunk.i.transform(
                 lambda i: self.states_map_original_to_lumped.get(i, None)
@@ -201,13 +208,10 @@ class DatasetProcessor:
             chunk["lumped_f"] = chunk.f.transform(
                 lambda f: self.states_map_original_to_lumped.get(f, None)
             )
-            print(chunk)
             # get rid of all the transitions from or to a non-existing lumped state
             chunk = chunk.dropna(axis="rows")
-            print(chunk)
             # get rid of all the transitions within the same lumped state
             chunk = chunk.loc[chunk.lumped_i != chunk.lumped_f]
-            print(chunk)
             raise NotImplementedError
 
     def _process_state_lump(self, df):
