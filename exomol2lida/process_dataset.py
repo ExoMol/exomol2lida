@@ -4,7 +4,6 @@ Module with functionality for processing ExoMol datasets into Lida data
 The processing is controlled by the input/molecules.json (see ``read_inputs`` module
 and its docstrings).
 """
-import time
 
 import pandas as pd
 from exomole.read_data import states_chunks, trans_chunks
@@ -108,6 +107,7 @@ class DatasetProcessor:
         for chunk in trans_chunks(
             trans_paths=self.trans_paths, chunk_size=self.trans_chunk_size
         ):
+            # print(f"loaded a chunk of a .trans file of size {len(chunk):,}")
             yield chunk.copy(deep=True)
 
     def lump_states(self):
@@ -200,6 +200,8 @@ class DatasetProcessor:
         # clean up the column names, remove temporary columns
         lumped_states["J(E)"] = lumped_states["J_en"]
         lumped_states.drop(columns=["J_en", "sum_w", "sum_en_x_w"], inplace=True)
+        # prepare a column for lifetimes:
+        lumped_states["tau"] = float("inf")
         # add a column with lump size (number of original states in each lump):
         lumped_states.loc[:, "lump_size"] = [
             len(self.states_map_lumped_to_original[lumped_i])
@@ -227,35 +229,94 @@ class DatasetProcessor:
         self.lumped_states = lumped_states
 
     def lump_transitions(self):
+        """Method to lump all the transitions into composites only from and to resolved
+        composite states.
+
+        All the composite transitions are saved in ``self.lumped_transitions``
+        DataFrame.
+        """
+        # rolling sums of A_if for each transitions prelump (original_i -> lumped_f)
+        prelumps_einstein_coeff_sums = pd.Series(dtype="float64")
+        # rolling prelump sizes for each transitions prelump (original_i -> lumped_f)
+        prelumps_sizes = pd.Series(dtype="float64")
+
         for chunk in self.trans_chunks:
-            print("Original chunk")
-            print(chunk)
             # add columns mapping initial and final states onto the lumped states
-            t0 = time.time()
             chunk["lumped_i"] = chunk.i.transform(
                 lambda i: self.states_map_original_to_lumped.get(i, None)
             )
             chunk["lumped_f"] = chunk.f.transform(
                 lambda f: self.states_map_original_to_lumped.get(f, None)
             )
-            print("After adding the lumped indices")
-            print(chunk)
             # get rid of all the transitions from or to a non-existing lumped state
-            chunk = chunk.dropna(axis="rows")
-            # now I can convert the lumped index values into int
-            chunk.loc[:, "lumped_i"] = chunk.lumped_i.astype("int64")
-            chunk.loc[:, "lumped_f"] = chunk.lumped_f.astype("int64")
-            print("After dropping nan values")
-            print(chunk)
+            chunk.dropna(axis="rows", inplace=True)
             # get rid of all the transitions within the same lumped state
             chunk = chunk.loc[chunk.lumped_i != chunk.lumped_f]
-            print("After dropping the transitions within lump")
-            print(chunk)
-            print(f"Chunk processing time: {time.time() - t0}")
-            break
+            if not len(chunk):
+                # no transitions survived the filtering, go to the next iteration
+                continue
+
+            # now I can convert the lumped index values into int ("lumped_i" column
+            # will be lost during the first grouping, so not worrying about it.)
+            chunk.loc[:, "lumped_f"] = chunk.lumped_f.astype("int64")
+            # after iteration over the chunks, I need sums of einstein coefficients
+            # for transitions from the *original* initial index to the *lumped* final
+            # index
+            chunk_groupby = chunk.groupby(["i", "lumped_f"])
+            current_prelumps_einstein_coeff_sums = (
+                chunk_groupby["A_if"].sum().astype("float64")
+            )
+            current_prelumps_sizes = chunk_groupby["A_if"].count().astype("float64")
+
+            if not len(prelumps_einstein_coeff_sums):
+                # seed both the rolling prelump series:
+                prelumps_einstein_coeff_sums = current_prelumps_einstein_coeff_sums
+                prelumps_sizes = current_prelumps_sizes
+            else:
+                # just add to the rolling sums
+                prelumps_einstein_coeff_sums = prelumps_einstein_coeff_sums.add(
+                    current_prelumps_einstein_coeff_sums, fill_value=0
+                )
+                prelumps_sizes = prelumps_sizes.add(
+                    current_prelumps_sizes, fill_value=0
+                )
+
+        # dataframe with partial lifetimes of individual pre-lumps
+        # (between i_orig and f_lumped)
+        prelumped_transitions = pd.DataFrame(
+            {
+                "tau_i_orig_f_lumped": 1 / prelumps_einstein_coeff_sums,
+                "prelump_size": prelumps_sizes,
+            }
+        )
+        prelumped_transitions.reset_index(inplace=True)
+        # re-add the i_lumped and combine the pre-lumps into the final composite
+        # transitions
+        prelumped_transitions["lumped_i"] = prelumped_transitions.i.transform(
+            lambda i: self.states_map_original_to_lumped[i]
+        )
+        prelumped_transitions_groupby = prelumped_transitions.groupby(
+            ["lumped_i", "lumped_f"]
+        )
+        # create the lumped_transitions dataframe
+        tau_if = prelumped_transitions_groupby["tau_i_orig_f_lumped"].mean()
+        lump_size = prelumped_transitions_groupby["prelump_size"].sum()
+        lumped_transitions = pd.DataFrame()
+        lumped_transitions["tau_if"] = tau_if
+        lumped_transitions["lump_size"] = lump_size.astype("int64")
+        lumped_transitions.reset_index(inplace=True)
+        lumped_transitions.columns = ["i", "f", "tau_if", "lump_size"]
+        self.lumped_transitions = lumped_transitions
+
+        # populate the total lifetimes for the composite states
+        transitions_copy = lumped_transitions.copy(deep=True)
+        transitions_copy.loc[:, "tau_if_inverse"] = 1 / transitions_copy["tau_if"]
+        tau_i_inverse = transitions_copy.groupby("i")["tau_if_inverse"].sum()
+        assert set(tau_i_inverse.index).issubset(self.lumped_states.index), "defense"
+        self.lumped_states.loc[tau_i_inverse.index, "tau"] = 1 / tau_i_inverse
 
     def _process_state_lump(self, df):
-        """A helper function for processing a lumped states.
+        """A helper function for processing to-be-lumped states.
 
         This method is applied on a DataFrame of a group (lump) of states which all
         share the same values of the resolved quanta.
@@ -273,7 +334,6 @@ class DatasetProcessor:
         Returns
         -------
         pandas.Series
-
         """
         # first record the lump into the states_map dict:
         lumped_state = tuple(df.iloc[0].loc[self.resolved_quanta])
