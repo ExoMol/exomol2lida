@@ -5,11 +5,10 @@ from exomol2lida.process_dataset import DatasetProcessor
 
 
 mol_input = get_input("HCN", input_json_path="input/molecules.json")
-print(f"states header : {mol_input.states_header}")
+
 mol_processor = DatasetProcessor(mol_input)
+mol_processor.trans_chunk_size = 5_000_000
 
-t0 = time()
 mol_processor.lump_states()
-print(f"Process time: {time() - t0}")
 
-print(mol_processor.lumped_states)
+mol_processor.lump_transitions()

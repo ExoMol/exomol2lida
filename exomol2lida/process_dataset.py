@@ -4,6 +4,7 @@ Module with functionality for processing ExoMol datasets into Lida data
 The processing is controlled by the input/molecules.json (see ``read_inputs`` module
 and its docstrings).
 """
+import time
 
 import pandas as pd
 from exomole.read_data import states_chunks, trans_chunks
@@ -13,12 +14,34 @@ from .read_inputs import MoleculeInput
 
 
 class DatasetProcessor:
-    """
+    """Class for processing a single ExoMole dataset into the Lida data.
+
+    Upon instantiation with a valid ``MoleculeInput`` instance, two methods must be
+    called: ``lump_states`` and ``lump_transitions``. This will produce the
+    Lida data.
+
     Parameters
     ----------
     molecule_input : MoleculeInput
+
+    Attributes
+    ----------
+    resolved_quanta : list[str]
+    lumped_states : pandas.DataFrame
+    states_map_lumped_to_original : dict[int, set[int]]
+    states_map_original_to_lumped : dict[int, int]
+    lumped_transitions : pandas.DataFrame
+
+    Methods
+    -------
+    lump_states
+        Populates the ``lumped_states`` DataFrame and the states maps.
+    lump_transitions
+        Populates the ``lumped_transitions`` DataFrame.
     """
 
+    states_chunk_size = STATES_CHUNK_SIZE
+    trans_chunk_size = TRANS_CHUNK_SIZE
     discarded_quanta_values = {"*"}
 
     def __init__(self, molecule_input):
@@ -41,10 +64,9 @@ class DatasetProcessor:
 
     @property
     def states_chunks(self):
-        """
-        Get chunks of the dataset states file.
+        """Get chunks of the dataset states file.
 
-        Generator of pd.DataFrame chunks of the .states file, with
+        Generator of pandas.DataFrame chunks of the .states file, with
         (hopefully correctly) assigned columns, and indexed by states indices
         (the states indices are NOT present as a column, but as the dataframe index).
         The columns of each chunk are as follows:
@@ -54,50 +76,50 @@ class DatasetProcessor:
 
         Yields
         -------
-        states_chunk : pd.DataFrame
+        states_chunk : pandas.DataFrame
             Generated chunks of the states file, each is a pd.DataFrame
         """
         assert self.states_header[0] == "i", f"Defense on {self.formula}"
         chunks_generator = states_chunks(
             states_path=self.states_path,
-            chunk_size=STATES_CHUNK_SIZE,
+            chunk_size=self.states_chunk_size,
             columns=self.states_header[1:],
         )
         for chunk in chunks_generator:
             chunk.loc[:, "J"] = chunk.loc[:, "J"].astype("float64")
             chunk.loc[:, "E"] = chunk.loc[:, "E"].astype("float64")
             chunk.loc[:, "g_tot"] = chunk.loc[:, "g_tot"].astype("float64")
-            yield chunk
+            yield chunk.copy(deep=True)
 
     @property
     def trans_chunks(self):
-        """
-        Get chunks of the dataset trans file.
+        """Get chunks of the dataset trans file.
 
-        Generator of pd.DataFrame chunks of all the .trans files for this dataset.
+        Generator of pandas.DataFrame chunks of all the .trans files for this dataset.
         The indices of the frame are irrelevant, the columns are as follows:
         'i', 'f', 'A_if' [, 'v_if'].
         The 'i' and 'f' columns correspond to the indices in the .states file.
 
         Yields
         -------
-        trans_chunk : pd.DataFrame
+        trans_chunk : pandas.DataFrame
             Generated chunks of the trans file, each is a pd.DataFrame
         """
         for chunk in trans_chunks(
-            trans_paths=self.trans_paths, chunk_size=TRANS_CHUNK_SIZE
+            trans_paths=self.trans_paths, chunk_size=self.trans_chunk_size
         ):
-            yield chunk
+            yield chunk.copy(deep=True)
 
     def lump_states(self):
         """Method to lump all the non-resolved states into composite states.
 
-        All the composite states are saved in self.lumped_states DataFrame and maps are
-        created linking original to lumped state ids.
+        All the composite states are saved in ``self.lumped_states`` DataFrame and maps
+        are created linking original to lumped state ids (indices in the original
+        .states file and the ``lumped_states`` DataFrame).
         """
         lumped_states = None
         for chunk in self.states_chunks:
-            # initial filtering
+            # initial filtering based on the input and ``discarded_quanta_values``
             mask = pd.Series(True, index=chunk.index)
             for quantum, val in self.only_with.items():
                 mask = mask & (chunk[quantum] == val)
@@ -110,7 +132,10 @@ class DatasetProcessor:
             if not len(chunk):
                 # no states survived the filtering, go to the next iteration
                 continue
+            # group the states chunk into a multi-indexed DataFrame of composite states
             chunk_grouped = chunk.groupby(self.resolved_quanta)
+            # process each multi-index into the final composite state and add the
+            # processed chunk to the lumped_states
             lumped_states_chunk = chunk_grouped.apply(self._process_state_lump)
             if lumped_states is None:
                 # seed the lumped_states dataframe
@@ -120,7 +145,13 @@ class DatasetProcessor:
                     dtype="float64",
                 )
                 lumped_states.loc[:, "J_en"] = float("inf")
-            # if in the current lumped_states_chunk there is either  J
+
+            # ======================================================================== #
+            # the ugly code in this bloc only ensures that energy for each lump is
+            # calculated only from the lowest-J states, and I cannot know in which
+            # chunk this will appear.
+
+            # if in the current lumped_states_chunk there is either J
             # or a new index, I need to reset those rows in the lumped_states and
             # forget all the accumulated sum_w and sum_en_x_w...
             # new index:
@@ -162,62 +193,88 @@ class DatasetProcessor:
             )
             # and get rid of the temp. dataframe
             lumped_states = lumped_states_updated
+            # ======================================================================== #
 
-        # calculate the energy weighted average
+        # calculate the g_tot-weighted energy average per each lump
         lumped_states["E"] = (lumped_states.sum_en_x_w / lumped_states.sum_w).round(5)
         # clean up the column names, remove temporary columns
         lumped_states["J(E)"] = lumped_states["J_en"]
         lumped_states.drop(columns=["J_en", "sum_w", "sum_en_x_w"], inplace=True)
-        # add a column with lump size:
+        # add a column with lump size (number of original states in each lump):
         lumped_states.loc[:, "lump_size"] = [
             len(self.states_map_lumped_to_original[lumped_i])
             for lumped_i in lumped_states.index
         ]
         lumped_states.sort_values(by="E", inplace=True)
-
         # flatten the lumped_states multiindex into columns and reset index
         # each lumped state will get it's own integer index
         lumped_index_orig = list(lumped_states.index)
         lumped_states.reset_index(inplace=True)
         lumped_index_update_map = dict(zip(lumped_index_orig, lumped_states.index))
+        # states_map_lumped_to_original was created (by _process_state_lump helper)
+        # with the original multi-index, now I need to update it so it is
+        # index-to-set[index] (int-to-set[int]).
         self.states_map_lumped_to_original = {
             lumped_index_update_map[key]: val
             for key, val in self.states_map_lumped_to_original.items()
         }
-
-        # populate the forward map from the original index to the lumped index:
+        # similarly: populate forward map from the original index to the lumped index:
         for lumped_i, original_indices in self.states_map_lumped_to_original.items():
             self.states_map_original_to_lumped.update(
                 {i: lumped_i for i in original_indices}
             )
-
         # and save the result as an instance attribute
         self.lumped_states = lumped_states
 
     def lump_transitions(self):
         for chunk in self.trans_chunks:
-            if "v_if" in chunk:
-                chunk.drop(columns=["v_if"])
-            # TODO: as the trans chunks will likely be very large, it is better to
-            #       create new masks/filtering series, rather than adding columns to
-            #       the trans chunks!
-            # add columns mapping initial and final states on to the lumped states
+            print("Original chunk")
+            print(chunk)
+            # add columns mapping initial and final states onto the lumped states
+            t0 = time.time()
             chunk["lumped_i"] = chunk.i.transform(
                 lambda i: self.states_map_original_to_lumped.get(i, None)
             )
             chunk["lumped_f"] = chunk.f.transform(
                 lambda f: self.states_map_original_to_lumped.get(f, None)
             )
+            print("After adding the lumped indices")
+            print(chunk)
             # get rid of all the transitions from or to a non-existing lumped state
             chunk = chunk.dropna(axis="rows")
+            # now I can convert the lumped index values into int
+            chunk.loc[:, "lumped_i"] = chunk.lumped_i.astype("int64")
+            chunk.loc[:, "lumped_f"] = chunk.lumped_f.astype("int64")
+            print("After dropping nan values")
+            print(chunk)
             # get rid of all the transitions within the same lumped state
             chunk = chunk.loc[chunk.lumped_i != chunk.lumped_f]
-            raise NotImplementedError
+            print("After dropping the transitions within lump")
+            print(chunk)
+            print(f"Chunk processing time: {time.time() - t0}")
+            break
 
     def _process_state_lump(self, df):
-        # this is applied on a dataframe of a group (lump) of states which all share
-        # the same values of the resolved quanta
+        """A helper function for processing a lumped states.
 
+        This method is applied on a DataFrame of a group (lump) of states which all
+        share the same values of the resolved quanta.
+
+        Takes a dataframe filled with original states within one to-be composited state
+        and does all the processing (like averaging energy, recording the J_ref for
+        energy - lowest J, etc.). As the lumps are coming in states chunks, all
+        needs to be done incrementally. This method is designed only as a helper method
+        and only to be supplied to the ``apply`` method on a *grouped* pandas.DataFrame.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+
+        Returns
+        -------
+        pandas.Series
+
+        """
         # first record the lump into the states_map dict:
         lumped_state = tuple(df.iloc[0].loc[self.resolved_quanta])
         # lumped_state tuple will also be the new MultiIndex value after grouping
