@@ -21,7 +21,9 @@ class DatasetProcessor:
 
     Parameters
     ----------
-    molecule_input : MoleculeInput
+    molecule : MoleculeInput or str
+        If str passed, MoleculeInput is instantiated with data from the input file for
+        the given ``molecule_formula = molecule`` passed.
 
     Attributes
     ----------
@@ -43,7 +45,12 @@ class DatasetProcessor:
     trans_chunk_size = TRANS_CHUNK_SIZE
     discarded_quanta_values = {"*"}
 
-    def __init__(self, molecule_input):
+    def __init__(self, molecule):
+        if isinstance(molecule, MoleculeInput):
+            molecule_input = molecule
+        else:
+            molecule_input = MoleculeInput(molecule_formula=molecule)
+
         self.formula = molecule_input.formula
         self.states_path = molecule_input.states_path
         self.trans_paths = molecule_input.trans_paths
@@ -106,7 +113,7 @@ class DatasetProcessor:
         for chunk in trans_chunks(
             trans_paths=self.trans_paths, chunk_size=self.trans_chunk_size
         ):
-            print(f"loaded a chunk of a .trans file of size {len(chunk):,}")
+            # print(f"loaded a chunk of a .trans file of size {len(chunk):,}")
             yield chunk.copy(deep=True)
 
     def lump_states(self):

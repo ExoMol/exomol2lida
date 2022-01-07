@@ -50,7 +50,7 @@ from pathlib import Path
 from exomole.read_def import DefParser, DefParseError
 from exomole.utils import get_num_columns
 
-from config.config import EXOMOL_DATA_DIR
+from config.config import EXOMOL_DATA_DIR, INPUT_DIR
 from .exceptions import MoleculeInputError
 
 
@@ -64,9 +64,12 @@ class MoleculeInput:
     Parameters
     ----------
     molecule_formula : str
-    kwargs : dict
-        All the keys under the `molecule_formula` entry in the *molecules.json* input
-        file.
+    kwargs : dict, optional
+        If not supplied, the class will load all the necessary arguments from the
+        ``INPUT_DIR/molecules.json``.
+        If omitted, all the necessary arguments (see the structure of ``molecules.json``
+        input file discussed in the docstring for `read_inputs` module) need to be
+        passed explicitly.
 
     Attributes
     ----------
@@ -111,6 +114,9 @@ class MoleculeInput:
         self.only_with = {}
 
         # populate the attributes:
+        if not len(kwargs):
+            with open(INPUT_DIR / "molecules.json", "r") as fp:
+                kwargs = json.load(fp)[molecule_formula]
         for attr, val in kwargs.items():
             setattr(self, attr, val)
         self.energy_max = float(self.energy_max)
@@ -248,35 +254,12 @@ class MoleculeInput:
             raise MoleculeInputError(msg)
 
 
-def get_input(molecule_formula, input_json_path):
-    """Get the `MoleculeInput` instance for a single `molecule_formula`.
-
-    Parameters
-    ----------
-    molecule_formula : str
-    input_json_path : str or Path
-
-    Returns
-    -------
-    MoleculeInput
-
-    Raises
-    ------
-    MoleculeInputError, DefParseError
-        If the input data for this `molecule_formula` are in any way inconsistent.
-    """
-    with open(input_json_path, "r") as fp:
-        inputs_dict = json.load(fp)
-    return MoleculeInput(molecule_formula, **inputs_dict[molecule_formula])
-
-
-def get_all_inputs(input_json_path, bypass_exceptions=False, verbose=True):
+def get_all_inputs(bypass_exceptions=False, verbose=True):
     """Get the `MoleculeInput` instances for all formulas specified in the input
     json file.
 
     Parameters
     ----------
-    input_json_path : str or Path
     bypass_exceptions : bool, optional
     verbose : bool, optional
 
@@ -284,7 +267,7 @@ def get_all_inputs(input_json_path, bypass_exceptions=False, verbose=True):
     -------
     dict[str, Optional[MoleculeInput]]
     """
-    with open(input_json_path, "r") as fp:
+    with open(INPUT_DIR / "molecules.json", "r") as fp:
         inputs_dict = json.load(fp)
     all_inputs = {}
     num_exceptions_raised = 0
