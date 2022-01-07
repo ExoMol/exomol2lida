@@ -1,7 +1,7 @@
 """
 Module with functionality for processing ExoMol datasets into Lida data
 
-The processing is controlled by the input/molecules.json (see ``read_inputs`` module
+The processing is controlled by the input/molecules.json (see `read_inputs` module
 and its docstrings).
 """
 
@@ -15,8 +15,8 @@ from .read_inputs import MoleculeInput
 class DatasetProcessor:
     """Class for processing a single ExoMole dataset into the Lida data.
 
-    Upon instantiation with a valid ``MoleculeInput`` instance, two methods must be
-    called: ``lump_states`` and ``lump_transitions``. This will produce the
+    Upon instantiation with a valid `MoleculeInput` instance, two methods must be
+    called: `lump_states` and `lump_transitions`. This will produce the
     Lida data.
 
     Parameters
@@ -34,9 +34,9 @@ class DatasetProcessor:
     Methods
     -------
     lump_states
-        Populates the ``lumped_states`` DataFrame and the states maps.
+        Populates the `lumped_states` DataFrame and the states maps.
     lump_transitions
-        Populates the ``lumped_transitions`` DataFrame.
+        Populates the `lumped_transitions` DataFrame.
     """
 
     states_chunk_size = STATES_CHUNK_SIZE
@@ -112,13 +112,13 @@ class DatasetProcessor:
     def lump_states(self):
         """Method to lump all the non-resolved states into composite states.
 
-        All the composite states are saved in ``self.lumped_states`` DataFrame and maps
+        All the composite states are saved in `self.lumped_states` `DataFrame` and maps
         are created linking original to lumped state ids (indices in the original
-        .states file and the ``lumped_states`` DataFrame).
+        .states file and the `lumped_states` `DataFrame`).
         """
         lumped_states = None
         for chunk in self.states_chunks:
-            # initial filtering based on the input and ``discarded_quanta_values``
+            # initial filtering based on the input and `discarded_quanta_values`
             mask = pd.Series(True, index=chunk.index)
             for quantum, val in self.only_with.items():
                 mask = mask & (chunk[quantum] == val)
@@ -231,7 +231,7 @@ class DatasetProcessor:
         """Method to lump all the transitions into composites only from and to resolved
         composite states.
 
-        All the composite transitions are saved in ``self.lumped_transitions``
+        All the composite transitions are saved in `self.lumped_transitions`
         DataFrame.
         """
         # rolling sums of A_if for each transitions prelump (original_i -> lumped_f)
@@ -324,7 +324,7 @@ class DatasetProcessor:
         and does all the processing (like averaging energy, recording the J_ref for
         energy - lowest J, etc.). As the lumps are coming in states chunks, all
         needs to be done incrementally. This method is designed only as a helper method
-        and only to be supplied to the ``apply`` method on a *grouped* pandas.DataFrame.
+        and only to be supplied to the `apply` method on a *grouped* pandas.DataFrame.
 
         Parameters
         ----------

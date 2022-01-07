@@ -8,40 +8,40 @@ The *molecules.json* is expected to hold the following entries:
   "iso_slug": str,
   "dataset_name": str,
   "states_header": list[str] (optional, bypasses .def file if specified),
-  "resolve_el": list[str] (optional if ``resolve_vib`` not specified),
-  "resolve_vib": list[str] (optional if ``resolve_el`` not specified),
+  "resolve_el": list[str] (optional if `resolve_vib` not specified),
+  "resolve_vib": list[str] (optional if `resolve_el` not specified),
   "energy_max": number (optional),
   "only_with": dict[str, str] (optional)
 }
 
-``molecule_formula``: Identifier for the Lida database, does not have to correspond
-    to the ``mol_slug`` or ``iso_slug``. For example "HD+" might be used
-    instead of "H2+". Must be, however, parsable by PyValem package.
-``mol_slug``, ``iso_slug``, ``dataset_name``: Mandatory attributes for each
-    ``molecule_formula``, these three attributes will determine where to look for the
-    data inside the ``EXOMOL_DATA_DIR``.
-``states_header``: The list of column names for the .states data table. If not supplied,
+`molecule_formula`: Identifier for the Lida database, does not have to correspond
+    to the `mol_slug` or `iso_slug`. For example ``"HD+"`` might be used
+    instead of ``"H2+"``. Must be, however, parsable by `PyValem` package.
+`mol_slug`, `iso_slug`, `dataset_name`: Mandatory attributes for each
+    `molecule_formula`, these three attributes will determine where to look for the
+    data inside the `EXOMOL_DATA_DIR`.
+`states_header`: The list of column names for the .states data table. If not supplied,
     the .def file for the given dataset is parsed and the .states column names are
     inferred from there. It should always be preferred to keep the .def files in order
     rather than patching inconsistent .def files by this higher-level fix.
-``resolve_el``, ``resolve_vib``: The lists of .states columns which need to be
+`resolve_el`, `resolve_vib`: The lists of .states columns which need to be
     *resolved*. All the other columns will be lumped over and the resolved ones will
     stay in the output composite states and their transitions.
-``energy_max``: Optional maximal energy in cm-1. States with higher energy will simply
+`energy_max`: Optional maximal energy in cm-1. States with higher energy will simply
     be filtered out and with them all their transitions (to and from).
-``only_with``: This attribute allows for adjustable pre-filtering of the .states and
-    .trans files. Keys of the ``only_with`` dict are .states column names and values
+`only_with`: This attribute allows for adjustable pre-filtering of the .states and
+    .trans files. Keys of the `only_with` dict are .states column names and values
     are the only values allowed in these .states columns. As an example,
-    "HCN": {..., "only_with": {"iso": "HNC"}, ...} will pre-filter the dataset and
-    remove all the states (and their transitions) with "iso" column values (in .states
-    file) not equaling "HNC".
+    ``"HCN": {..., "only_with": {"iso": "HNC"}, ...}`` will pre-filter the dataset and
+    remove all the states (and their transitions) with ``"iso"`` column values
+    (in .states file) not equaling ``"HNC"``.
 
-A ``MoleculeInput`` class instantiated without exceptions signals data without
+A `MoleculeInput` class instantiated without exceptions signals data without
 inconsistencies and ready to be processed into the Lida data product. All the possible
 consistency checks are performed upon MoleculeInput instantiation.
-The ``MoleculeInput`` instance will contain all the original *molecules.json* fields per
-each ``molecule_formula`` saved as instance attributes, as well as couple of additional
-attributes, such as ``self.def_path``, ``self.states_path`` and ``self.trans_paths``.
+The `MoleculeInput` instance will contain all the original *molecules.json* fields per
+each `molecule_formula` saved as instance attributes, as well as couple of additional
+attributes, such as `self.def_path`, `self.states_path` and `self.trans_paths`.
 """
 
 import json
@@ -57,7 +57,7 @@ from .exceptions import MoleculeInputError
 class MoleculeInput:
     """Class representing Molecule Inputs.
 
-    Loads all the attributes for a single ``molecule_formula`` from the
+    Loads all the attributes for a single `molecule_formula` from the
     *inputs/molecules.json*, does whole lot of validation and preparation for the
     states lumping.
 
@@ -65,7 +65,7 @@ class MoleculeInput:
     ----------
     molecule_formula : str
     kwargs : dict
-        All the keys under the ``molecule_formula`` entry in the *molecules.json* input
+        All the keys under the `molecule_formula` entry in the *molecules.json* input
         file.
 
     Attributes
@@ -249,7 +249,7 @@ class MoleculeInput:
 
 
 def get_input(molecule_formula, input_json_path):
-    """Get the ``MoleculeInput`` instance for a single ``molecule_formula``.
+    """Get the `MoleculeInput` instance for a single `molecule_formula`.
 
     Parameters
     ----------
@@ -263,7 +263,7 @@ def get_input(molecule_formula, input_json_path):
     Raises
     ------
     MoleculeInputError, DefParseError
-        If the input data for this ``molecule_formula`` are in any way inconsistent.
+        If the input data for this `molecule_formula` are in any way inconsistent.
     """
     with open(input_json_path, "r") as fp:
         inputs_dict = json.load(fp)
@@ -271,7 +271,7 @@ def get_input(molecule_formula, input_json_path):
 
 
 def get_all_inputs(input_json_path, bypass_exceptions=False, verbose=True):
-    """Get the ``MoleculeInput`` instances for all formulas specified in the input
+    """Get the `MoleculeInput` instances for all formulas specified in the input
     json file.
 
     Parameters
