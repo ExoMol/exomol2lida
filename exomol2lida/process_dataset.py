@@ -78,11 +78,10 @@ class DatasetProcessor:
         states_chunk : pandas.DataFrame
             Generated chunks of the states file, each is a pd.DataFrame
         """
-        assert self.states_header[0] == "i", f"Defense on {self.formula}"
         chunks_generator = states_chunks(
             states_path=self.states_path,
             chunk_size=self.states_chunk_size,
-            columns=self.states_header[1:],
+            columns=self.states_header,
         )
         for chunk in chunks_generator:
             chunk.loc[:, "J"] = chunk.loc[:, "J"].astype("float64")
@@ -107,7 +106,7 @@ class DatasetProcessor:
         for chunk in trans_chunks(
             trans_paths=self.trans_paths, chunk_size=self.trans_chunk_size
         ):
-            # print(f"loaded a chunk of a .trans file of size {len(chunk):,}")
+            print(f"loaded a chunk of a .trans file of size {len(chunk):,}")
             yield chunk.copy(deep=True)
 
     def lump_states(self):

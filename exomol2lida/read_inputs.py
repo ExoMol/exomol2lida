@@ -188,14 +188,7 @@ class MoleculeInput:
                 # states header. If they are not there, that means the DefParser did
                 # not finish cleanly.
                 raise self.def_parser_raised
-            assert self.def_parser.lifetime_availability is not None, "Defense"
-            assert self.def_parser.lande_factor_availability is not None, "Defense"
-            self.states_header = ["i", "E", "g_tot", "J"]
-            if self.def_parser.lifetime_availability:
-                self.states_header.append("tau")
-            if self.def_parser.lande_factor_availability:
-                self.states_header.append("g_J")
-            self.states_header.extend(self.def_parser.get_quanta_labels())
+            self.states_header = self.def_parser.get_states_header()
 
         # resolve_el and resolve_vib must not share any states:
         if set(self.resolve_el).intersection(self.resolve_vib):
