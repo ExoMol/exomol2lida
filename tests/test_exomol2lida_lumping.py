@@ -1,3 +1,8 @@
+"""
+These are integration tests ensuring that the chunk_sizes and number of .trans files
+do not have any effect on the states and transitions lumping outputs.
+"""
+
 from pathlib import Path
 
 import pytest
@@ -31,6 +36,9 @@ mol_input = MoleculeInput(
         "only_with": {"iso": "1"},
     },
 )
+# test files are built from a real dataset, but were skimmed down to manageable size
+# of 500,000 transitions (with split files of 100,000 transitions each),
+# and only states involved in the transitions left are present in the states file.
 states_path = test_resources_dir / "dummy_data.states.bz2"
 trans_paths_full = [test_resources_dir / "dummy_data.trans.bz2"]
 trans_paths_split = sorted(test_resources_dir.glob("dummy_data.trans_0*.bz2"))
@@ -39,6 +47,9 @@ shared_for_comparison = {
     "lumped_states": None,
     "states_map_lumped_to_original": None,
     "states_map_original_to_lumped": None,
+    "lumped_states_lifetimes": [
+        None,
+    ],
     "lumped_transitions": None,
 }
 
@@ -69,5 +80,41 @@ def test_states_lumping(monkeypatch, chunk_size):
         )
 
 
-def test_trans_lumping(monkeypatch):
-    pass
+@pytest.mark.parametrize(
+    "trans_paths, chunk_size",
+    (
+        (trans_paths_full, 1_000_000),
+        (trans_paths_full, 100_000),
+        (trans_paths_full, 10_000),
+        (trans_paths_split, 100_000),
+        (trans_paths_split, 10_000),
+        (trans_paths_split, 5_000),
+    ),
+)
+def test_trans_lumping(monkeypatch, trans_paths, chunk_size):
+    # prepare
+    processor = DatasetProcessor(molecule=mol_input)
+    monkeypatch.setattr(processor, "states_path", states_path)
+    processor.states_chunk_size = 1_000_000
+    processor.lump_states()
+    # run tests
+    monkeypatch.setattr(processor, "trans_paths", trans_paths)
+    processor.trans_chunk_size = chunk_size
+    processor.lump_transitions()
+    if shared_for_comparison["lumped_states_lifetimes"] == [
+        None,
+    ]:
+        shared_for_comparison["lumped_states_lifetimes"] = list(
+            processor.lumped_states["tau"]
+        )
+        shared_for_comparison["lumped_transitions"] = processor.lumped_transitions.copy(
+            deep=True
+        )
+    else:
+        assert (
+            list(processor.lumped_states["tau"])
+            == shared_for_comparison["lumped_states_lifetimes"]
+        )
+        assert processor.lumped_transitions.equals(
+            shared_for_comparison["lumped_transitions"]
+        )
