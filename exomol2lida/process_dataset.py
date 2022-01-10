@@ -4,11 +4,13 @@ Module with functionality for processing ExoMol datasets into Lida data
 The processing is controlled by the input/molecules.json (see `read_inputs` module
 and its docstrings).
 """
+import json
+from datetime import datetime
 
 import pandas as pd
 from exomole.read_data import states_chunks, trans_chunks
 
-from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE
+from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE, OUTPUT_DIR
 from .read_inputs import MoleculeInput
 
 
@@ -51,6 +53,7 @@ class DatasetProcessor:
         else:
             molecule_input = MoleculeInput(molecule_formula=molecule)
 
+        self.molecule_input = molecule_input
         self.formula = molecule_input.formula
         self.states_path = molecule_input.states_path
         self.trans_paths = molecule_input.trans_paths
@@ -67,6 +70,10 @@ class DatasetProcessor:
         self.states_map_original_to_lumped = {}
 
         self.lumped_transitions = None
+
+        self.output_dir = OUTPUT_DIR / self.formula
+        if self.output_dir.exists() and list(self.output_dir.iterdir()):
+            raise FileExistsError(f"The directory {self.output_dir} is not empty!")
 
     @property
     def states_chunks(self):
@@ -360,3 +367,47 @@ class DatasetProcessor:
             index=["J_en", "sum_w", "sum_en_x_w"],
             dtype="float64",
         )
+
+    def _log_metadata(self):
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        metadata = {
+            "input": self.molecule_input.raw_input,
+            "iso_formula": self.molecule_input.iso_formula,
+            "version": self.molecule_input.version,
+            "mass": self.molecule_input.mass,
+            "processed_on": str(datetime.now()),
+        }
+        metadata_path = self.output_dir / "meta_data.json"
+        with open(metadata_path, "w") as fp:
+            json.dump(metadata, fp, indent=2)
+
+    def _log_states_data(self):
+        if self.lumped_states is None:
+            return
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        data_cols = [col for col in ["tau", "E"] if col in self.lumped_states.columns]
+        with open(self.output_dir / "states_data.csv", "w") as fp:
+            self.lumped_states[data_cols].to_csv(fp, header=True, index=True)
+        el_cols = self.resolve_el
+        if len(el_cols):
+            with open(self.output_dir / "states_electronic.csv", "w") as fp:
+                self.lumped_states[el_cols].to_csv(fp, header=True, index=True)
+        vib_cols = self.resolve_vib
+        if len(vib_cols):
+            with open(self.output_dir / "states_vibrational.csv", "w") as fp:
+                self.lumped_states[vib_cols].to_csv(fp, header=True, index=True)
+        with open(self.output_dir / "states_composite_map.json", "w") as fp:
+            json.dump(self.states_map_lumped_to_original, fp, indent=2)
+
+    def _log_transitions_data(self):
+        if self.lumped_transitions is None:
+            return
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        cols = ["i", "f", "tau_if"]
+        with open(self.output_dir / "transitions_data.csv", "w") as fp:
+            self.lumped_transitions[cols].to_csv(fp, header=True, index=False)
+
+    def _log_outputs(self):
+        self._log_metadata()
+        self._log_states_data()
+        self._log_transitions_data()

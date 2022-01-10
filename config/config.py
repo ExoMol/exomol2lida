@@ -13,8 +13,6 @@ EXOMOL_DATA_DIR = None
 STATES_CHUNK_SIZE = 1_000_000
 # chunk size for .trans files: roughly 10,000,000 per 1GB of RAM
 TRANS_CHUNK_SIZE = 10_000_000
-# maximal state energy (states with higher E are simply discarded)
-ENERGY_MAX = 1_000
 
 # ****************************** LOCAL CONFIG **************************************** #
 # load the local config:

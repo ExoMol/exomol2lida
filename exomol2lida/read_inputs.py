@@ -99,9 +99,12 @@ class MoleculeInput:
 
     def __init__(self, molecule_formula, **kwargs):
         self.formula = molecule_formula
+        self.raw_input = None
         self.def_parser = None
         self.def_parser_raised = None
+        self.iso_formula = None
         self.version = None
+        self.mass = None
 
         # stubs for all the arguments which might be expected:
         self.mol_slug = None
@@ -117,6 +120,7 @@ class MoleculeInput:
         if not len(kwargs):
             with open(INPUT_DIR / "molecules.json", "r") as fp:
                 kwargs = json.load(fp)[molecule_formula]
+        self.raw_input = kwargs.copy()
         for attr, val in kwargs.items():
             setattr(self, attr, val)
         self.energy_max = float(self.energy_max)
