@@ -6,12 +6,15 @@ and its docstrings).
 """
 import json
 from datetime import datetime
+import math
 
 import pandas as pd
 from exomole.read_data import states_chunks, trans_chunks
+from tqdm import tqdm
 
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE, OUTPUT_DIR
 from .read_inputs import MoleculeInput
+from .utils import MapEncoder
 
 
 class DatasetProcessor:
@@ -41,6 +44,8 @@ class DatasetProcessor:
         Populates the `lumped_states` DataFrame and the states maps.
     lump_transitions
         Populates the `lumped_transitions` DataFrame.
+    process
+        Lump states and transitions and log the data.
     """
 
     states_chunk_size = STATES_CHUNK_SIZE
@@ -131,7 +136,13 @@ class DatasetProcessor:
         .states file and the `lumped_states` `DataFrame`).
         """
         lumped_states = None
-        for chunk in self.states_chunks:
+        num_states = self.molecule_input.def_parser.num_states
+        total_iter = math.ceil(
+            num_states / self.states_chunk_size if num_states else float("inf")
+        )
+        for chunk in tqdm(
+            self.states_chunks, total=total_iter, desc=f"{self.formula} states"
+        ):
             # initial filtering based on the input and `discarded_quanta_values`
             mask = pd.Series(True, index=chunk.index)
             for quantum, val in self.only_with.items():
@@ -253,7 +264,13 @@ class DatasetProcessor:
         # rolling prelump sizes for each transitions prelump (original_i -> lumped_f)
         prelumps_sizes = pd.Series(dtype="float64")
 
-        for chunk in self.trans_chunks:
+        num_trans = self.molecule_input.def_parser.num_transitions
+        total_iter = math.ceil(
+            num_trans / self.trans_chunk_size if num_trans else float("inf")
+        )
+        for chunk in tqdm(
+            self.trans_chunks, total=total_iter, desc=f"{self.formula} transitions"
+        ):
             # add columns mapping initial and final states onto the lumped states
             chunk["lumped_i"] = chunk.i.transform(
                 lambda i: self.states_map_original_to_lumped.get(i, None)
@@ -268,10 +285,11 @@ class DatasetProcessor:
             if not len(chunk):
                 # no transitions survived the filtering, go to the next iteration
                 continue
-
             # now I can convert the lumped index values into int ("lumped_i" column
             # will be lost during the first grouping, so not worrying about it.)
-            chunk.loc[:, "lumped_f"] = chunk.lumped_f.astype("int64")
+            with pd.option_context("mode.chained_assignment", None):
+                # just so suppress the SettingWithCopyWarning
+                chunk.loc[:, "lumped_f"] = chunk.lumped_f.astype("int64")
             # after iteration over the chunks, I need sums of einstein coefficients
             # for transitions from the *original* initial index to the *lumped* final
             # index
@@ -293,7 +311,6 @@ class DatasetProcessor:
                 prelumps_sizes = prelumps_sizes.add(
                     current_prelumps_sizes, fill_value=0
                 )
-
         # dataframe with partial lifetimes of individual pre-lumps
         # (between i_orig and f_lumped)
         prelumped_transitions = pd.DataFrame(
@@ -368,7 +385,15 @@ class DatasetProcessor:
             dtype="float64",
         )
 
-    def _log_metadata(self):
+    def _log_dataset_metadata(self):
+        """Log all the relevant metadata for the current processing session.
+
+        The meta-data are logged into the output folder in the .json format.
+        Included are various molecule and isotopologue-related data needed by the
+        lida-web project, as well as the dataset version and the full *raw input*
+        from the ``input`` folder, for checking if the processed data are up-to-date
+        with the ExoMol data or with the input file.
+        """
         self.output_dir.mkdir(parents=True, exist_ok=True)
         metadata = {
             "input": self.molecule_input.raw_input,
@@ -381,25 +406,66 @@ class DatasetProcessor:
         with open(metadata_path, "w") as fp:
             json.dump(metadata, fp, indent=2)
 
+    def _log_states_metadata(self):
+        """Log the lumped states metadata for the current processing session.
+
+        If the `self.lump_states` method has not yet been run, this method will
+        not log anything silently.
+        The data are logged into the output folder in the .csv format under several
+        files, containing the electronic and vibrational resolved quanta, and also a
+        .json file mapping IDs of the lumped states back to the original ids of the
+        ExoMol states.
+        """
+        if self.lumped_states is None:
+            return
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        el_cols = self.resolve_el
+        if len(el_cols):
+            with open(self.output_dir / "states_electronic.csv", "w") as fp:
+                self.lumped_states[el_cols].to_csv(
+                    fp, header=True, index=True, index_label="i"
+                )
+        vib_cols = self.resolve_vib
+        if len(vib_cols):
+            with open(self.output_dir / "states_vibrational.csv", "w") as fp:
+                self.lumped_states[vib_cols].to_csv(
+                    fp, header=True, index=True, index_label="i"
+                )
+        with open(self.output_dir / "states_composite_map.json", "w") as fp:
+            json.dump(
+                self.states_map_lumped_to_original,
+                fp,
+                indent=2,
+                cls=MapEncoder,
+                sort_keys=True,
+            )
+
     def _log_states_data(self):
+        """Log the lumped states data for the current processing session.
+
+        If the `self.lump_states` method has not yet been run, this method will
+        not log anything silently.
+        The data are logged into the output folder in the .csv format.
+        """
         if self.lumped_states is None:
             return
         self.output_dir.mkdir(parents=True, exist_ok=True)
         data_cols = [col for col in ["tau", "E"] if col in self.lumped_states.columns]
         with open(self.output_dir / "states_data.csv", "w") as fp:
-            self.lumped_states[data_cols].to_csv(fp, header=True, index=True)
-        el_cols = self.resolve_el
-        if len(el_cols):
-            with open(self.output_dir / "states_electronic.csv", "w") as fp:
-                self.lumped_states[el_cols].to_csv(fp, header=True, index=True)
-        vib_cols = self.resolve_vib
-        if len(vib_cols):
-            with open(self.output_dir / "states_vibrational.csv", "w") as fp:
-                self.lumped_states[vib_cols].to_csv(fp, header=True, index=True)
-        with open(self.output_dir / "states_composite_map.json", "w") as fp:
-            json.dump(self.states_map_lumped_to_original, fp, indent=2)
+            self.lumped_states[data_cols].to_csv(
+                fp, header=True, index=True, index_label="i"
+            )
 
     def _log_transitions_data(self):
+        """Log all the relevant lumped transitions data for the current processing
+        session.
+
+        If the `self.lump_transition` method has not yet been run, this method will
+        not log anything silently.
+        The data are logged into the output folder in the .csv format. The output file
+        has the following header: ['i', 'f', 'tau_if'], where ``'i'`` and ``'f'``
+        columns values correspond to the index column of the logged states .csv files.
+        """
         if self.lumped_transitions is None:
             return
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -407,7 +473,18 @@ class DatasetProcessor:
         with open(self.output_dir / "transitions_data.csv", "w") as fp:
             self.lumped_transitions[cols].to_csv(fp, header=True, index=False)
 
-    def _log_outputs(self):
-        self._log_metadata()
+    def process(self):
+        """Lump states and transitions and log all the outputs into the relevant
+        location.
+        """
+        # lump and log the states:
+        self.lump_states()
+        self._log_dataset_metadata()
+        self._log_states_metadata()
+        self._log_states_data()
+        # lump and log the transitions (the states file gets the "tau" column, so must
+        # be re-logged.)
+        self.lump_transitions()
+        self._log_dataset_metadata()
         self._log_states_data()
         self._log_transitions_data()
