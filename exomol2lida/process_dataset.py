@@ -366,7 +366,10 @@ class DatasetProcessor:
         pandas.Series
         """
         # first record the lump into the states_map dict:
-        lumped_state = tuple(df.iloc[0].loc[self.resolved_quanta])
+        if len(self.resolved_quanta) == 1:
+            lumped_state = df.iloc[0].loc[self.resolved_quanta[0]]  # str
+        else:
+            lumped_state = tuple(df.iloc[0].loc[self.resolved_quanta])  # tuple[str]
         # lumped_state tuple will also be the new MultiIndex value after grouping
         if lumped_state not in self.states_map_lumped_to_original:
             self.states_map_lumped_to_original[lumped_state] = set()

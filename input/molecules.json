@@ -12,7 +12,8 @@
   "CO": {
     "mol_slug": "CO",
     "iso_slug": "12C-16O",
-    "dataset_name": "Li2015"
+    "dataset_name": "Li2015",
+    "resolve_vib": ["v"]
   },
   "CH4": {
     "mol_slug": "CH4",
