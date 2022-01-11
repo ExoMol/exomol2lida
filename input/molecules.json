@@ -43,12 +43,14 @@
   "HF": {
     "mol_slug": "HF",
     "iso_slug": "1H-19F",
-    "dataset_name": "Coxon-Hajig"
+    "dataset_name": "Coxon-Hajig",
+    "resolve_vib": ["v"]
   },
   "HCl": {
     "mol_slug": "HCl",
     "iso_slug": "1H-35Cl",
-    "dataset_name": "HITRAN"
+    "dataset_name": "HITRAN",
+    "resolve_vib": ["v"]
   },
   "H2CO": {
     "mol_slug": "H2CO",
@@ -102,7 +104,8 @@
   "CS": {
     "mol_slug": "CS",
     "iso_slug": "12C-32S",
-    "dataset_name": "JnK"
+    "dataset_name": "JnK",
+    "resolve_vib": ["v"]
   },
   "H2": {
     "mol_slug": "H2",
@@ -112,22 +115,27 @@
   "LiH": {
     "mol_slug": "LiH",
     "iso_slug": "7Li-1H",
-    "dataset_name": "CLT"
+    "dataset_name": "CLT",
+    "resolve_vib": ["v"]
   },
   "LiH+": {
     "mol_slug": "LiH_p",
     "iso_slug": "7Li-1H_p",
-    "dataset_name": "CLT"
+    "dataset_name": "CLT",
+    "resolve_vib": ["v"]
   },
   "BeH": {
     "mol_slug": "BeH",
     "iso_slug": "9Be-1H",
-    "dataset_name": "Darby-Lewis"
+    "dataset_name": "Darby-Lewis",
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "CaH": {
     "mol_slug": "CaH",
     "iso_slug": "40Ca-1H",
-    "dataset_name": "Yadin"
+    "dataset_name": "Yadin",
+    "resolve_vib": ["v"]
   },
   "SiH": {
     "mol_slug": "SiH",
@@ -152,12 +160,15 @@
   "SiO": {
     "mol_slug": "SiO",
     "iso_slug": "28Si-16O",
-    "dataset_name": "EBJT"
+    "dataset_name": "EBJT",
+    "resolve_vib": ["v"]
   },
   "TiO": {
     "mol_slug": "TiO",
     "iso_slug": "48Ti-16O",
-    "dataset_name": "Toto"
+    "dataset_name": "Toto",
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "MgO": {
     "mol_slug": "MgO",
@@ -192,7 +203,8 @@
   "NaCl": {
     "mol_slug": "NaCl",
     "iso_slug": "23Na-35Cl",
-    "dataset_name": "Barton"
+    "dataset_name": "Barton",
+    "resolve_vib": ["v"]
   },
   "SO3": {
     "mol_slug": "SO3",
@@ -207,7 +219,9 @@
   "VO": {
     "mol_slug": "VO",
     "iso_slug": "51V-16O",
-    "dataset_name": "VOMYT"
+    "dataset_name": "VOMYT",
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "SH": {
     "mol_slug": "SH",
@@ -217,27 +231,34 @@
   "AlO": {
     "mol_slug": "AlO",
     "iso_slug": "27Al-16O",
-    "dataset_name": "ATP"
+    "dataset_name": "ATP",
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "ScH": {
     "mol_slug": "ScH",
     "iso_slug": "45Sc-1H",
-    "dataset_name": "LYT"
+    "dataset_name": "LYT",
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "KCl": {
     "mol_slug": "KCl",
     "iso_slug": "39K-35Cl",
-    "dataset_name": "Barton"
+    "dataset_name": "Barton",
+    "resolve_vib": ["v"]
   },
   "CaO": {
     "mol_slug": "CaO",
     "iso_slug": "40Ca-16O",
-    "dataset_name": "VBATHY"
+    "dataset_name": "VBATHY",
+    "resolve_el": ["State"],
   },
   "PN": {
     "mol_slug": "PN",
     "iso_slug": "31P-14N",
-    "dataset_name": "YYLT"
+    "dataset_name": "YYLT",
+    "resolve_vib": ["v"]
   },
   "PS": {
     "mol_slug": "PS",
@@ -267,7 +288,8 @@
   "SiS": {
     "mol_slug": "SiS",
     "iso_slug": "28Si-32S",
-    "dataset_name": "UCTY"
+    "dataset_name": "UCTY",
+    "resolve_vib": ["v"]
   },
   "AsH3": {
     "mol_slug": "AsH3",
