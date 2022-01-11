@@ -252,7 +252,7 @@
     "mol_slug": "CaO",
     "iso_slug": "40Ca-16O",
     "dataset_name": "VBATHY",
-    "resolve_el": ["State"],
+    "resolve_el": ["State"]
   },
   "PN": {
     "mol_slug": "PN",
