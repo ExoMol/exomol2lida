@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE, OUTPUT_DIR
 from .read_inputs import MoleculeInput
-from .utils import MapEncoder
+from .utils import MapEncoder, EV_IN_CM
 
 
 class DatasetProcessor:
@@ -220,7 +220,9 @@ class DatasetProcessor:
             # ======================================================================== #
 
         # calculate the g_tot-weighted energy average per each lump
-        lumped_states["E"] = (lumped_states.sum_en_x_w / lumped_states.sum_w).round(5)
+        lumped_states["E"] = (
+            lumped_states.sum_en_x_w / lumped_states.sum_w / EV_IN_CM
+        ).round(5)
         # clean up the column names, remove temporary columns
         lumped_states["J(E)"] = lumped_states["J_en"]
         lumped_states.drop(columns=["J_en", "sum_w", "sum_en_x_w"], inplace=True)

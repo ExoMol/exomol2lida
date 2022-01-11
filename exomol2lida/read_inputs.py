@@ -10,7 +10,7 @@ The *molecules.json* is expected to hold the following entries:
   "states_header": list[str] (optional, bypasses .def file if specified),
   "resolve_el": list[str] (optional if `resolve_vib` not specified),
   "resolve_vib": list[str] (optional if `resolve_el` not specified),
-  "energy_max": number (optional),
+  "energy_max": number (optional), in [eV],
   "only_with": dict[str, str] (optional)
 }
 
@@ -27,7 +27,7 @@ The *molecules.json* is expected to hold the following entries:
 `resolve_el`, `resolve_vib`: The lists of .states columns which need to be
     *resolved*. All the other columns will be lumped over and the resolved ones will
     stay in the output composite states and their transitions.
-`energy_max`: Optional maximal energy in cm-1. States with higher energy will simply
+`energy_max`: Optional maximal energy in [eV]. States with higher energy will simply
     be filtered out and with them all their transitions (to and from).
 `only_with`: This attribute allows for adjustable pre-filtering of the .states and
     .trans files. Keys of the `only_with` dict are .states column names and values
@@ -52,6 +52,7 @@ from exomole.utils import get_num_columns
 
 from config.config import EXOMOL_DATA_DIR, INPUT_DIR
 from .exceptions import MoleculeInputError
+from .utils import EV_IN_CM
 
 
 class MoleculeInput:
@@ -82,6 +83,7 @@ class MoleculeInput:
     resolve_el : list[str]
     resolve_vib : list[str]
     energy_max : float
+        This is in [cm-1], converted from the input file.
     only_with : dict[str, str]
     def_path : Path
     states_path : Path
@@ -123,7 +125,7 @@ class MoleculeInput:
         self.raw_input = kwargs.copy()
         for attr, val in kwargs.items():
             setattr(self, attr, val)
-        self.energy_max = float(self.energy_max)
+        self.energy_max = float(self.energy_max) * EV_IN_CM
         if not all([self.mol_slug, self.iso_slug, self.dataset_name]):
             raise MoleculeInputError(
                 f"Input data for {molecule_formula} missing some of the mandatory "
