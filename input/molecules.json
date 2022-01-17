@@ -264,7 +264,7 @@
     "mol_slug": "CaO",
     "iso_slug": "40Ca-16O",
     "dataset_name": "VBATHY",
-    "states_header": ["/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": ["i", "E", "g_tot", "J", "tau", "/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
