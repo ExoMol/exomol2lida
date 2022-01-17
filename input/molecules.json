@@ -8,7 +8,7 @@
     "mol_slug": "CO2",
     "iso_slug": "12C-16O2",
     "dataset_name": "UCL-4000",
-    "resolved_vib": ["n1", "n2", "n3"]
+    "resolve_vib": ["n1", "n2", "n3"]
   },
   "CO": {
     "mol_slug": "CO",
@@ -20,7 +20,7 @@
     "mol_slug": "CH4",
     "iso_slug": "12C-1H4",
     "dataset_name": "YT34to10",
-    "resolved_vib": ["n1", "n2", "n3", "n4"]
+    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "NO": {
     "mol_slug": "NO",
@@ -31,7 +31,7 @@
     "mol_slug": "SO2",
     "iso_slug": "32S-16O2",
     "dataset_name": "ExoAmes",
-    "resolved_vib": ["v1", "v2", "v3"]
+    "resolve_vib": ["v1", "v2", "v3"]
   },
   "NH3": {
     "mol_slug": "NH3",
@@ -42,7 +42,7 @@
     "mol_slug": "HNO3",
     "iso_slug": "1H-14N-16O3",
     "dataset_name": "AIJS",
-    "resolved_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9"]
+    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9"]
   },
   "HF": {
     "mol_slug": "HF",
@@ -79,13 +79,13 @@
     "mol_slug": "CH3Cl",
     "iso_slug": "12C-1H3-35Cl",
     "dataset_name": "OYT",
-    "resolved_vib": ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"]
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"]
   },
   "H2O2": {
     "mol_slug": "H2O2",
     "iso_slug": "1H2-16O2",
     "dataset_name": "APTY",
-    "resolved_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "C2H2": {
     "mol_slug": "C2H2",
@@ -96,19 +96,19 @@
     "mol_slug": "PH3",
     "iso_slug": "31P-1H3",
     "dataset_name": "SAlTY",
-    "resolved_vib": ["v1", "v2", "v3", "v4"]
+    "resolve_vib": ["v1", "v2", "v3", "v4"]
   },
   "H2S": {
     "mol_slug": "H2S",
     "iso_slug": "1H2-32S",
     "dataset_name": "AYT2",
-    "resolved_vib": ["v1", "v2", "v3"]
+    "resolve_vib": ["v1", "v2", "v3"]
   },
   "C2H4": {
     "mol_slug": "C2H4",
     "iso_slug": "12C2-1H4",
     "dataset_name": "MaYTY",
-    "resolved_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "n10", "n11", "n12"]
+    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "n10", "n11", "n12"]
   },
   "CS": {
     "mol_slug": "CS",
@@ -288,7 +288,7 @@
     "mol_slug": "SiH4",
     "iso_slug": "28Si-1H4",
     "dataset_name": "OY2T",
-    "resolved_vib": ["n1", "n2", "n3", "n4"]
+    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "NS": {
     "mol_slug": "NS",
@@ -299,7 +299,7 @@
     "mol_slug": "CH3F",
     "iso_slug": "12C-1H3-19F",
     "dataset_name": "OYKYT",
-    "resolved_vib": ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"]
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"]
   },
   "SiS": {
     "mol_slug": "SiS",
@@ -356,12 +356,12 @@
     "mol_slug": "KOH",
     "iso_slug": "39K-16O-1H",
     "dataset_name": "OYT4",
-    "resolved_vib": ["v1", "v2lin", "v3"]
+    "resolve_vib": ["v1", "v2lin", "v3"]
   },
   "NaOH": {
     "mol_slug": "NaOH",
     "iso_slug": "23Na-16O-1H",
     "dataset_name": "OYT5",
-    "resolved_vib": ["v1", "v2lin", "v3"]
+    "resolve_vib": ["v1", "v2lin", "v3"]
   }
 }
