@@ -85,7 +85,7 @@
     "mol_slug": "H2O2",
     "iso_slug": "1H2-16O2",
     "dataset_name": "APTY",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "G", "v1", "v2", "v3", "v4", "v5", "v6", "tau", "Gv", "K", "Pr", "Gr", "N(Bl", "C2", "n1", "n2", "n3", "n4", "n5", "n6"],
+    "states_header": ["i", "E", "g_tot", "J", "tau", "G", "v1", "v2", "v3", "v4", "v5", "v6", "tau1", "Gv", "K", "Pr", "Gr", "N(Bl", "C2", "n1", "n2", "n3", "n4", "n5", "n6"],
     "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "C2H2": {
