@@ -238,7 +238,10 @@
   "C2": {
     "mol_slug": "C2",
     "iso_slug": "12C2",
-    "dataset_name": "8states"
+    "dataset_name": "8states",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega", "m/d"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "CN": {
     "mol_slug": "CN",
