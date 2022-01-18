@@ -217,7 +217,9 @@
   "H3+": {
     "mol_slug": "H3_p",
     "iso_slug": "1H3_p",
-    "dataset_name": "MiZATeP"
+    "dataset_name": "MiZATeP",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "p", "Sym", "v1", "v2", "l2", "G", "U", "K"],
+    "resolve_vib": ["v1", "v2"]
   },
   "HeH+": {
     "mol_slug": "HeH_p",
