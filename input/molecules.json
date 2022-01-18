@@ -224,12 +224,16 @@
   "HeH+": {
     "mol_slug": "HeH_p",
     "iso_slug": "4He-1H_p",
-    "dataset_name": "ADJSAAM"
+    "dataset_name": "ADJSAAM",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "v"],
+    "resolve_vib": ["v"]
   },
   "HD+": {
     "mol_slug": "H2_p",
     "iso_slug": "1H-2H_p",
-    "dataset_name": "ADJSAAM"
+    "dataset_name": "ADJSAAM",
+    "states_header": ["i", "E", "g_tot", "J", "v"],
+    "resolve_vib": ["v"]
   },
   "C2": {
     "mol_slug": "C2",
