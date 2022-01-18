@@ -37,6 +37,7 @@
     "mol_slug": "SO2",
     "iso_slug": "32S-16O2",
     "dataset_name": "ExoAmes",
+    "states_header": ["i", "E", "g_tot", "J", "p", "v1", "v2", "v3", "Ka", "Kc"],
     "resolve_vib": ["v1", "v2", "v3"]
   },
   "NH3": {
