@@ -134,7 +134,9 @@
   "H2": {
     "mol_slug": "H2",
     "iso_slug": "1H2",
-    "dataset_name": "RACPPK"
+    "dataset_name": "RACPPK",
+    "states_header": ["i", "E", "g_tot", "J", "v"],
+    "resolve_vib": ["v"]
   },
   "LiH": {
     "mol_slug": "LiH",
