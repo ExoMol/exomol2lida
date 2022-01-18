@@ -167,7 +167,10 @@
   "SiH": {
     "mol_slug": "SiH",
     "iso_slug": "28Si-1H",
-    "dataset_name": "SiGHTLY"
+    "dataset_name": "SiGHTLY",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g_factor", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "AlH": {
     "mol_slug": "AlH",
