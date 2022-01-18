@@ -2,7 +2,9 @@
   "H2O": {
     "mol_slug": "H2O",
     "iso_slug": "1H2-16O",
-    "dataset_name": "POKAZATEL"
+    "dataset_name": "POKAZATEL",
+    "states_header": ["i", "E", "g_tot", "J", "K_a", "K_c", "v1", "v2", "v3", "S"],
+    "resolve_vib": ["v1", "v2", "v3"]
   },
   "CO2": {
     "mol_slug": "CO2",
