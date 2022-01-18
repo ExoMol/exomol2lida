@@ -43,7 +43,9 @@
   "NH3": {
     "mol_slug": "NH3",
     "iso_slug": "14N-1H3",
-    "dataset_name": "CoYuTe"
+    "dataset_name": "CoYuTe",
+    "states_header": ["i", "E", "g_tot", "J", "p", "Gamma", "Nb", "n1", "n2", "n3", "n4", "l3", "l4", "tau_i", "J'", "K", "tau_r", "v1", "v2", "v3", "v4", "v5", "v6", "Gamma_vib", "E_CYT"],
+    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "HNO3": {
     "mol_slug": "HNO3",
