@@ -209,7 +209,10 @@
   "MgO": {
     "mol_slug": "MgO",
     "iso_slug": "24Mg-16O",
-    "dataset_name": "LiTY"
+    "dataset_name": "LiTY",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "H3+": {
     "mol_slug": "H3_p",
