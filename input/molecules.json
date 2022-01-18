@@ -90,7 +90,8 @@
     "mol_slug": "CH3Cl",
     "iso_slug": "12C-1H3-35Cl",
     "dataset_name": "OYT",
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"]
+    "states_header": ["i", "E", "g_tot", "J", "Gamma", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "Gamma_vib", "J'", "K", "tau_r", "Gamma_rot", "Ci^2"],
+    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9"]
   },
   "H2O2": {
     "mol_slug": "H2O2",
