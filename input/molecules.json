@@ -103,7 +103,9 @@
   "C2H2": {
     "mol_slug": "C2H2",
     "iso_slug": "12C2-1H2",
-    "dataset_name": "aCeTY"
+    "dataset_name": "aCeTY",
+    "states_header": ["i", "E", "g_tot", "J", "unc.", "Gamma", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "Gamma_vib", "K", "tau_rot", "Gamma_rot", "R_trove"],
+    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7"]
   },
   "PH3": {
     "mol_slug": "PH3",
