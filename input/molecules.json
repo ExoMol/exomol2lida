@@ -68,7 +68,9 @@
   "H2CO": {
     "mol_slug": "H2CO",
     "iso_slug": "1H2-12C-16O",
-    "dataset_name": "AYTY"
+    "dataset_name": "AYTY",
+    "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "v4", "v5", "v6", "Gamma_vib", "K'", "Gamma_rot", "I", "C^2", "n1", "n2", "n3", "n4", "n5", "n6"],
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "HCN": {
     "mol_slug": "HCN",
