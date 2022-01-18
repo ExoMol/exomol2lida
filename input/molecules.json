@@ -246,7 +246,10 @@
   "CN": {
     "mol_slug": "CN",
     "iso_slug": "12C-14N",
-    "dataset_name": "Trihybrid"
+    "dataset_name": "Trihybrid",
+    "states_header": ["i", "E", "g_tot", "J", "unc", "tau", "g", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega", "Source", "E_Duo"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "NaCl": {
     "mol_slug": "NaCl",
