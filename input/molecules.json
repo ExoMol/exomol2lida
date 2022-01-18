@@ -28,7 +28,10 @@
   "NO": {
     "mol_slug": "NO",
     "iso_slug": "14N-16O",
-    "dataset_name": "XABC"
+    "dataset_name": "XABC",
+    "states_header": ["i", "E", "g_tot", "J", "dE", "tau", "g_J", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega", "label", "E_duo"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "SO2": {
     "mol_slug": "SO2",
