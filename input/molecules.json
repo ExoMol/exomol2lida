@@ -232,7 +232,7 @@
     "mol_slug": "H2_p",
     "iso_slug": "1H-2H_p",
     "dataset_name": "ADJSAAM",
-    "states_header": ["i", "E", "g_tot", "J", "v"],
+    "states_header": ["i", "E", "g_tot", "J", "tau", "v"],
     "resolve_vib": ["v"]
   },
   "C2": {
