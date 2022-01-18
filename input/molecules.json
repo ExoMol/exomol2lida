@@ -142,6 +142,7 @@
     "mol_slug": "LiH",
     "iso_slug": "7Li-1H",
     "dataset_name": "CLT",
+    "states_header": ["i", "E", "g_tot", "J", "v"],
     "resolve_vib": ["v"]
   },
   "LiH+": {
