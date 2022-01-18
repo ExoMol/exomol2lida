@@ -175,7 +175,10 @@
   "AlH": {
     "mol_slug": "AlH",
     "iso_slug": "27Al-1H",
-    "dataset_name": "AlHambra"
+    "dataset_name": "AlHambra",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "NaH": {
     "mol_slug": "NaH",
