@@ -267,8 +267,8 @@ class DatasetProcessor:
         prelumps_sizes = pd.Series(dtype="float64")
 
         num_trans = self.molecule_input.def_parser.num_transitions
-        total_iter = math.ceil(
-            num_trans / self.trans_chunk_size if num_trans else float("inf")
+        total_iter = (
+            math.ceil(num_trans / self.trans_chunk_size) if num_trans else float("inf")
         )
         for chunk in tqdm(
             self.trans_chunks, total=total_iter, desc=f"{self.formula} transitions"
