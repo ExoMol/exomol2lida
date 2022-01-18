@@ -10,6 +10,7 @@
     "mol_slug": "CO2",
     "iso_slug": "12C-16O2",
     "dataset_name": "UCL-4000",
+    "states_header": ["i", "E", "g_tot", "J", "uncert", "Gamma", "e/f", "n1", "n2lin", "l2", "n3", "Ci", "m1", "m2", "m3", "m4", "r", "v1", "v2", "v3"],
     "resolve_vib": ["n1", "n2", "n3"]
   },
   "CO": {
