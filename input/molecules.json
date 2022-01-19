@@ -334,7 +334,10 @@
   "PO": {
     "mol_slug": "PO",
     "iso_slug": "31P-16O",
-    "dataset_name": "POPS"
+    "dataset_name": "POPS",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "SiH4": {
     "mol_slug": "SiH4",
