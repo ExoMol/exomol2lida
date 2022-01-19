@@ -411,12 +411,16 @@
   "cis-P2H2": {
     "mol_slug": "cis-P2H2",
     "iso_slug": "cis-31P2-1H2",
-    "dataset_name": "OY-Cis"
+    "dataset_name": "OY-Cis",
+    "states_header": ["i", "E", "g_tot", "J", "totalSym", "K", "rotSym", "l", "v1", "v2", "v3", "v4", "v5", "v6", "vibSym"],
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "trans-P2H2": {
     "mol_slug": "trans-P2H2",
     "iso_slug": "trans-31P2-1H2",
-    "dataset_name": "OY-Trans"
+    "dataset_name": "OY-Trans",
+    "states_header": ["i", "E", "g_tot", "J", "totalSym", "K", "rotSym", "l", "v1", "v2", "v3", "v4", "v5", "v6", "vibSym"],
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "H3O+": {
     "mol_slug": "H3O_p",
