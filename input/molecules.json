@@ -397,7 +397,9 @@
   "SiH2": {
     "mol_slug": "SiH2",
     "iso_slug": "28Si-1H2",
-    "dataset_name": "CATS"
+    "dataset_name": "CATS",
+    "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "Gamma_vib", "Ka", "Kc", "Gamma_rot", "Ci", "n1", "n2", "n3"],
+    "resolve_vib": ["v1", "v2", "v3"]
   },
   "SiO2": {
     "mol_slug": "SiO2",
