@@ -375,7 +375,9 @@
   "PF3": {
     "mol_slug": "PF3",
     "iso_slug": "31P-19F3",
-    "dataset_name": "MCYTY"
+    "dataset_name": "MCYTY",
+    "states_header": ["i", "E", "g_tot", "J", "G", "J'", "G'", "n1", "n2", "n3", "n4", "n5", "n6", "Gv", "J''", "K", "Pr", "Gr"],
+    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6"]
   },
   "PH": {
     "mol_slug": "PH",
