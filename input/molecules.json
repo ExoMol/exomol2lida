@@ -368,7 +368,9 @@
   "AsH3": {
     "mol_slug": "AsH3",
     "iso_slug": "75As-1H3",
-    "dataset_name": "CYT18"
+    "dataset_name": "CYT18",
+    "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "v4", "v5", "v6", "Gvib", "J'", "K", "tau(rot)", "Grot"],
+    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "PF3": {
     "mol_slug": "PF3",
