@@ -283,7 +283,10 @@
   "SH": {
     "mol_slug": "SH",
     "iso_slug": "32S-1H",
-    "dataset_name": "GYT"
+    "dataset_name": "GYT",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g-factor", "parity", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "AlO": {
     "mol_slug": "AlO",
