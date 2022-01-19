@@ -425,7 +425,9 @@
   "H3O+": {
     "mol_slug": "H3O_p",
     "iso_slug": "1H3-16O_p",
-    "dataset_name": "eXeL"
+    "dataset_name": "eXeL",
+    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "n1", "n2", "n3", "l3", "n4", "l4", "Gamma_vib", "K", "Gamma_rot", "C", "v1", "v2", "v3", "v4", "v5", "v6"],
+    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "KOH": {
     "mol_slug": "KOH",
