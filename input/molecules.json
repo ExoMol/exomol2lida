@@ -292,6 +292,7 @@
     "mol_slug": "AlO",
     "iso_slug": "27Al-16O",
     "dataset_name": "ATP",
+    "states_header": ["i", "E", "g_tot", "J", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
