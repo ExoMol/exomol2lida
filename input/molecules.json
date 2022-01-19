@@ -267,7 +267,10 @@
   "YO": {
     "mol_slug": "YO",
     "iso_slug": "89Y-16O",
-    "dataset_name": "SSYT"
+    "dataset_name": "SSYT",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "VO": {
     "mol_slug": "VO",
