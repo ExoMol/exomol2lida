@@ -404,7 +404,9 @@
   "SiO2": {
     "mol_slug": "SiO2",
     "iso_slug": "28Si-16O2",
-    "dataset_name": "OYT3"
+    "dataset_name": "OYT3",
+    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "e/f", "v1", "v2lin", "L", "v3", "C", "n1", "n2", "n3", "Gamma_vib", "K", "Gamma_rot"],
+    "resolve_vib": ["v1", "v2lin", "v3"]
   },
   "cis-P2H2": {
     "mol_slug": "cis-P2H2",
