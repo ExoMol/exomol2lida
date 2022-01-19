@@ -433,12 +433,14 @@
     "mol_slug": "KOH",
     "iso_slug": "39K-16O-1H",
     "dataset_name": "OYT4",
+    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "v1", "v2lin", "L", "v3", "Ci", "n1", "n2", "n3"],
     "resolve_vib": ["v1", "v2lin", "v3"]
   },
   "NaOH": {
     "mol_slug": "NaOH",
     "iso_slug": "23Na-16O-1H",
     "dataset_name": "OYT5",
+    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "v1", "v2lin", "L", "v3", "Ci", "n1", "n2", "n3"],
     "resolve_vib": ["v1", "v2lin", "v3"]
   }
 }
