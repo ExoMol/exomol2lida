@@ -390,7 +390,9 @@
   "CH3": {
     "mol_slug": "CH3",
     "iso_slug": "12C-1H3",
-    "dataset_name": "AYYJ"
+    "dataset_name": "AYYJ",
+    "states_header": ["i", "E", "g_tot", "J", "+/-", "Gamma", "N(block)", "State", "n1", "n2", "n3", "n4", "l3", "l4", "tau(inv)", "J'", "K", "tau(rot)", "v1", "v2", "v3", "v4", "v5", "v6", "Gamma(vib)"],
+    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "SiH2": {
     "mol_slug": "SiH2",
