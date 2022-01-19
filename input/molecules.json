@@ -348,7 +348,10 @@
   "NS": {
     "mol_slug": "NS",
     "iso_slug": "14N-32S",
-    "dataset_name": "SNaSH"
+    "dataset_name": "SNaSH",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "resolve_el": ["State"],
+    "resolve_vib": ["v"]
   },
   "CH3F": {
     "mol_slug": "CH3F",
