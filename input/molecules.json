@@ -260,7 +260,9 @@
   "SO3": {
     "mol_slug": "SO3",
     "iso_slug": "32S-16O3",
-    "dataset_name": "UYT2"
+    "dataset_name": "UYT2",
+    "states_header": ["i", "E", "g_tot", "J", "Gamma", "K", "Gamma_rot", "v1", "v2", "v3", "v4", "v5", "v6", "n1", "n2", "n3", "L3", "n4", "L4", "Gamma_vib"],
+    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "YO": {
     "mol_slug": "YO",
