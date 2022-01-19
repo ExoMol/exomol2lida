@@ -276,6 +276,7 @@
     "mol_slug": "VO",
     "iso_slug": "51V-16O",
     "dataset_name": "VOMYT",
+    "states_header": ["i", "E", "g_tot", "J", "tau", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
