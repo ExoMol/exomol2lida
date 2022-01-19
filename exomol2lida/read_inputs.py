@@ -155,16 +155,21 @@ class MoleculeInput:
         if not self.def_path.is_file():
             raise MoleculeInputError(f"The .def file not found under {self.def_path}")
 
-        self.states_path = ds_root / f"{file_name_stem}.states.bz2"
-        if not self.states_path.is_file():
+        for states_path in [ds_root / f"{file_name_stem}.states.bz2", ds_root / f"{file_name_stem}.states"]:
+            if states_path.is_file():
+                self.states_path = states_path
+                break
+        else:
+            raise MoleculeInputError(f"No .states file found in {ds_root}")
+
+        for trans_wc in [f"{file_name_stem}*.trans.bz2", f"{file_name_stem}*.trans"]:
+            trans_paths = sorted(ds_root.glob(trans_wc))
+            if len(trans_paths):
+                self.trans_paths = trans_paths
+                break
+        else:
             raise MoleculeInputError(
-                f"The .states file not found under {self.states_path}"
-            )
-        trans_wc = f"{file_name_stem}*.trans.bz2"
-        self.trans_paths = sorted(ds_root.glob(trans_wc))
-        if not len(self.trans_paths):
-            raise MoleculeInputError(
-                f"No .trans files found under {ds_root / trans_wc}"
+                f"No .trans files found in {ds_root}"
             )
 
         # try to parse the .def file as far as I can get.
