@@ -145,12 +145,6 @@
     "states_header": ["i", "E", "g_tot", "J", "v"],
     "resolve_vib": ["v"]
   },
-  "LiH+": {
-    "mol_slug": "LiH_p",
-    "iso_slug": "7Li-1H_p",
-    "dataset_name": "CLT",
-    "resolve_vib": ["v"]
-  },
   "BeH": {
     "mol_slug": "BeH",
     "iso_slug": "9Be-1H",
@@ -225,14 +219,12 @@
     "mol_slug": "HeH_p",
     "iso_slug": "4He-1H_p",
     "dataset_name": "ADJSAAM",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "v"],
     "resolve_vib": ["v"]
   },
   "HD+": {
     "mol_slug": "H2_p",
     "iso_slug": "1H-2H_p",
     "dataset_name": "ADJSAAM",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "v"],
     "resolve_vib": ["v"]
   },
   "C2": {
@@ -336,7 +328,6 @@
     "iso_slug": "31P-16O",
     "dataset_name": "POPS",
     "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
-    "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
   "SiH4": {
@@ -350,7 +341,6 @@
     "iso_slug": "14N-32S",
     "dataset_name": "SNaSH",
     "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
-    "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
   "CH3F": {
