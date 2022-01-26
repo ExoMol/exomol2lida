@@ -2,7 +2,6 @@
 config/*local.py
 test.py
 .test_data
-output/
 
 # IDE
 .idea
