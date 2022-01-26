@@ -1,0 +1,29 @@
+{
+  "input": {
+    "mol_slug": "PH",
+    "iso_slug": "31P-1H",
+    "dataset_name": "LaTY",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "g_lande",
+      "+/-",
+      "e/f",
+      "State",
+      "v",
+      "N"
+    ],
+    "resolve_el": [
+      "State"
+    ],
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(31P)(1H)",
+  "version": 20190427,
+  "mass": 31.9817,
+  "processed_on": "2022-01-19 13:22:13.376458"
+}

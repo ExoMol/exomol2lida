@@ -1,0 +1,14 @@
+{
+  "input": {
+    "mol_slug": "SiS",
+    "iso_slug": "28Si-32S",
+    "dataset_name": "UCTY",
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(28Si)(32S)",
+  "version": 20180601,
+  "mass": 59.948998,
+  "processed_on": "2022-01-17 12:31:25.104984"
+}

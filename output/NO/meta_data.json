@@ -1,0 +1,35 @@
+{
+  "input": {
+    "mol_slug": "NO",
+    "iso_slug": "14N-16O",
+    "dataset_name": "XABC",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "dE",
+      "tau",
+      "g_J",
+      "+/-",
+      "e/f",
+      "State",
+      "v",
+      "Lambda",
+      "Sigma",
+      "Omega",
+      "label",
+      "E_duo"
+    ],
+    "resolve_el": [
+      "State"
+    ],
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(14N)(16O)",
+  "version": 20210422,
+  "mass": 29.9979886,
+  "processed_on": "2022-01-18 12:49:58.611047"
+}

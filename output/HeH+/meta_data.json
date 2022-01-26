@@ -1,0 +1,22 @@
+{
+  "input": {
+    "mol_slug": "HeH_p",
+    "iso_slug": "4He-1H_p",
+    "dataset_name": "ADJSAAM",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "tau",
+      "v"
+    ],
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(4He)(1H)+",
+  "version": 20200725,
+  "mass": 5.010428,
+  "processed_on": "2022-01-18 21:00:37.502932"
+}

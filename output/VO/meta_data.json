@@ -1,0 +1,31 @@
+{
+  "input": {
+    "mol_slug": "VO",
+    "iso_slug": "51V-16O",
+    "dataset_name": "VOMYT",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "tau",
+      "+/-",
+      "e/f",
+      "State",
+      "v",
+      "Lambda",
+      "Sigma",
+      "Omega"
+    ],
+    "resolve_el": [
+      "State"
+    ],
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(51V)(16O)",
+  "version": 20160726,
+  "mass": 66.938871,
+  "processed_on": "2022-01-19 10:13:15.650480"
+}

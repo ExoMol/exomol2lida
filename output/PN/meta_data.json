@@ -1,0 +1,14 @@
+{
+  "input": {
+    "mol_slug": "PN",
+    "iso_slug": "31P-14N",
+    "dataset_name": "YYLT",
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(31P)(14N)",
+  "version": 20160726,
+  "mass": 44.976836,
+  "processed_on": "2022-01-11 12:22:57.517844"
+}

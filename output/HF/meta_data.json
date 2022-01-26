@@ -1,0 +1,14 @@
+{
+  "input": {
+    "mol_slug": "HF",
+    "iso_slug": "1H-19F",
+    "dataset_name": "Coxon-Hajig",
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(1H)(19F)",
+  "version": 20191005,
+  "mass": 20.00622819,
+  "processed_on": "2022-01-11 12:13:20.532988"
+}

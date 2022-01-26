@@ -1,0 +1,14 @@
+{
+  "input": {
+    "mol_slug": "SiO",
+    "iso_slug": "28Si-16O",
+    "dataset_name": "EBJT",
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(28Si)(16O)",
+  "version": 20160726,
+  "mass": 43.971842,
+  "processed_on": "2022-01-11 12:20:32.509939"
+}

@@ -1,0 +1,14 @@
+{
+  "input": {
+    "mol_slug": "LiH_p",
+    "iso_slug": "7Li-1H_p",
+    "dataset_name": "CLT",
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(7Li)(1H)+",
+  "version": 20160726,
+  "mass": 8.02383,
+  "processed_on": "2022-01-11 12:19:23.782983"
+}

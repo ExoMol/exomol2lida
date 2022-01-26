@@ -1,0 +1,34 @@
+{
+  "input": {
+    "mol_slug": "SiH2",
+    "iso_slug": "28Si-1H2",
+    "dataset_name": "CATS",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "Gamma",
+      "v1",
+      "v2",
+      "v3",
+      "Gamma_vib",
+      "Ka",
+      "Kc",
+      "Gamma_rot",
+      "Ci",
+      "n1",
+      "n2",
+      "n3"
+    ],
+    "resolve_vib": [
+      "v1",
+      "v2",
+      "v3"
+    ]
+  },
+  "iso_formula": "(1H)2(28Si)",
+  "version": 20200201,
+  "mass": 29.9925766,
+  "processed_on": "2022-01-19 14:38:19.279548"
+}

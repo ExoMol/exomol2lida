@@ -1,0 +1,21 @@
+{
+  "input": {
+    "mol_slug": "H2",
+    "iso_slug": "1H2",
+    "dataset_name": "RACPPK",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "v"
+    ],
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(1H)2",
+  "version": 20191002,
+  "mass": 1.00782503224,
+  "processed_on": "2022-01-18 15:44:20.816378"
+}

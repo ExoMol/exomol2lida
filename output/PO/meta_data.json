@@ -1,0 +1,32 @@
+{
+  "input": {
+    "mol_slug": "PO",
+    "iso_slug": "31P-16O",
+    "dataset_name": "POPS",
+    "states_header": [
+      "i",
+      "E",
+      "g_tot",
+      "J",
+      "tau",
+      "g_lande",
+      "+/-",
+      "e/f",
+      "State",
+      "v",
+      "Lambda",
+      "Sigma",
+      "Omega"
+    ],
+    "resolve_el": [
+      "State"
+    ],
+    "resolve_vib": [
+      "v"
+    ]
+  },
+  "iso_formula": "(31P)(16O)",
+  "version": 20170910,
+  "mass": 46.96867624956,
+  "processed_on": "2022-01-19 10:20:39.947580"
+}
