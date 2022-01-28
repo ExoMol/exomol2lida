@@ -146,16 +146,15 @@ class DatasetProcessor:
             # initial filtering based on the input and `discarded_quanta_values`
             mask = pd.Series(True, index=chunk.index)
             for quantum, val in self.only_with.items():
-                mask = mask & (chunk[quantum] == val)
+                mask = mask & (chunk.loc[mask, quantum] == val)
             for quantum in self.resolved_quanta:
                 for val in self.discarded_quanta_values:
-                    mask = mask & (chunk[quantum] != val)
+                    mask = mask & (chunk.loc[mask, quantum] != val)
             # get rid of all the states with negative integer vibrational quanta
             for quantum in self.resolve_vib:
-                mask_neg = chunk.loc[mask, quantum].astype('int64') >= 0
-                mask = mask & mask_neg
+                mask = mask & (chunk.loc[mask, quantum].astype('int64') >= 0)
             if self.energy_max is not None:
-                mask = mask & (chunk["E"] <= self.energy_max)
+                mask = mask & (chunk.loc[mask, "E"] <= self.energy_max)
             chunk = chunk.loc[mask]
             if not len(chunk):
                 # no states survived the filtering, go to the next iteration
