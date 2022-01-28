@@ -1,29 +1,9 @@
 {
-  "H2O": {
-    "mol_slug": "H2O",
-    "iso_slug": "1H2-16O",
-    "dataset_name": "POKAZATEL",
-    "states_header": ["i", "E", "g_tot", "J", "K_a", "K_c", "v1", "v2", "v3", "S"],
-    "resolve_vib": ["v1", "v2", "v3"]
-  },
-  "CO2": {
-    "mol_slug": "CO2",
-    "iso_slug": "12C-16O2",
-    "dataset_name": "UCL-4000",
-    "states_header": ["i", "E", "g_tot", "J", "uncert", "Gamma", "e/f", "n1", "n2lin", "l2", "n3", "Ci", "m1", "m2", "m3", "m4", "r", "v1", "v2", "v3"],
-    "resolve_vib": ["n1", "n2", "n3"]
-  },
   "CO": {
     "mol_slug": "CO",
     "iso_slug": "12C-16O",
     "dataset_name": "Li2015",
     "resolve_vib": ["v"]
-  },
-  "CH4": {
-    "mol_slug": "CH4",
-    "iso_slug": "12C-1H4",
-    "dataset_name": "YT34to10",
-    "resolve_vib": ["n1", "n2", "n3", "n4"]
   },
   "NO": {
     "mol_slug": "NO",
@@ -33,44 +13,11 @@
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
-  "SO2": {
-    "mol_slug": "SO2",
-    "iso_slug": "32S-16O2",
-    "dataset_name": "ExoAmes",
-    "states_header": ["i", "E", "g_tot", "J", "p", "v1", "v2", "v3", "Ka", "Kc"],
-    "resolve_vib": ["v1", "v2", "v3"]
-  },
-  "NH3": {
-    "mol_slug": "NH3",
-    "iso_slug": "14N-1H3",
-    "dataset_name": "CoYuTe",
-    "states_header": ["i", "E", "g_tot", "J", "p", "Gamma", "Nb", "n1", "n2", "n3", "n4", "l3", "l4", "tau_i", "J'", "K", "tau_r", "v1", "v2", "v3", "v4", "v5", "v6", "Gamma_vib", "E_CYT"],
-    "resolve_vib": ["n1", "n2", "n3", "n4"]
-  },
-  "HNO3": {
-    "mol_slug": "HNO3",
-    "iso_slug": "1H-14N-16O3",
-    "dataset_name": "AIJS",
-    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9"]
-  },
   "HF": {
     "mol_slug": "HF",
     "iso_slug": "1H-19F",
     "dataset_name": "Coxon-Hajig",
     "resolve_vib": ["v"]
-  },
-  "HCl": {
-    "mol_slug": "HCl",
-    "iso_slug": "1H-35Cl",
-    "dataset_name": "HITRAN",
-    "resolve_vib": ["v"]
-  },
-  "H2CO": {
-    "mol_slug": "H2CO",
-    "iso_slug": "1H2-12C-16O",
-    "dataset_name": "AYTY",
-    "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "v4", "v5", "v6", "Gamma_vib", "K'", "Gamma_rot", "I", "C^2", "n1", "n2", "n3", "n4", "n5", "n6"],
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
   },
   "HCN": {
     "mol_slug": "HCN",
@@ -85,45 +32,6 @@
     "dataset_name": "Harris",
     "resolve_vib": ["v1", "v2", "v3"],
     "only_with": {"iso":  "1"}
-  },
-  "CH3Cl": {
-    "mol_slug": "CH3Cl",
-    "iso_slug": "12C-1H3-35Cl",
-    "dataset_name": "OYT",
-    "states_header": ["i", "E", "g_tot", "J", "Gamma", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "Gamma_vib", "J'", "K", "tau_r", "Gamma_rot", "Ci^2"],
-    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9"]
-  },
-  "H2O2": {
-    "mol_slug": "H2O2",
-    "iso_slug": "1H2-16O2",
-    "dataset_name": "APTY",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "G", "v1", "v2", "v3", "v4", "v5", "v6", "tau1", "Gv", "K", "Pr", "Gr", "N(Bl", "C2", "n1", "n2", "n3", "n4", "n5", "n6"],
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
-  },
-  "C2H2": {
-    "mol_slug": "C2H2",
-    "iso_slug": "12C2-1H2",
-    "dataset_name": "aCeTY",
-    "states_header": ["i", "E", "g_tot", "J", "unc.", "Gamma", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "Gamma_vib", "K", "tau_rot", "Gamma_rot", "R_trove"],
-    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7"]
-  },
-  "PH3": {
-    "mol_slug": "PH3",
-    "iso_slug": "31P-1H3",
-    "dataset_name": "SAlTY",
-    "resolve_vib": ["v1", "v2", "v3", "v4"]
-  },
-  "H2S": {
-    "mol_slug": "H2S",
-    "iso_slug": "1H2-32S",
-    "dataset_name": "AYT2",
-    "resolve_vib": ["v1", "v2", "v3"]
-  },
-  "C2H4": {
-    "mol_slug": "C2H4",
-    "iso_slug": "12C2-1H4",
-    "dataset_name": "MaYTY",
-    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6", "n7", "n8", "n9", "n10", "n11", "n12"]
   },
   "CS": {
     "mol_slug": "CS",
@@ -145,32 +53,11 @@
     "states_header": ["i", "E", "g_tot", "J", "v"],
     "resolve_vib": ["v"]
   },
-  "BeH": {
-    "mol_slug": "BeH",
-    "iso_slug": "9Be-1H",
-    "dataset_name": "Darby-Lewis",
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
-  },
-  "CaH": {
-    "mol_slug": "CaH",
-    "iso_slug": "40Ca-1H",
-    "dataset_name": "Yadin",
-    "resolve_vib": ["v"]
-  },
   "SiH": {
     "mol_slug": "SiH",
     "iso_slug": "28Si-1H",
     "dataset_name": "SiGHTLY",
     "states_header": ["i", "E", "g_tot", "J", "tau", "g_factor", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
-  },
-  "AlH": {
-    "mol_slug": "AlH",
-    "iso_slug": "27Al-1H",
-    "dataset_name": "AlHambra",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -193,47 +80,12 @@
     "dataset_name": "EBJT",
     "resolve_vib": ["v"]
   },
-  "TiO": {
-    "mol_slug": "TiO",
-    "iso_slug": "48Ti-16O",
-    "dataset_name": "Toto",
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
-  },
-  "MgO": {
-    "mol_slug": "MgO",
-    "iso_slug": "24Mg-16O",
-    "dataset_name": "LiTY",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
-  },
   "H3+": {
     "mol_slug": "H3_p",
     "iso_slug": "1H3_p",
     "dataset_name": "MiZATeP",
     "states_header": ["i", "E", "g_tot", "J", "tau", "p", "Sym", "v1", "v2", "l2", "G", "U", "K"],
     "resolve_vib": ["v1", "v2"]
-  },
-  "HeH+": {
-    "mol_slug": "HeH_p",
-    "iso_slug": "4He-1H_p",
-    "dataset_name": "ADJSAAM",
-    "resolve_vib": ["v"]
-  },
-  "HD+": {
-    "mol_slug": "H2_p",
-    "iso_slug": "1H-2H_p",
-    "dataset_name": "ADJSAAM",
-    "resolve_vib": ["v"]
-  },
-  "C2": {
-    "mol_slug": "C2",
-    "iso_slug": "12C2",
-    "dataset_name": "8states",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega", "m/d"],
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
   },
   "CN": {
     "mol_slug": "CN",
@@ -249,21 +101,6 @@
     "dataset_name": "Barton",
     "resolve_vib": ["v"]
   },
-  "SO3": {
-    "mol_slug": "SO3",
-    "iso_slug": "32S-16O3",
-    "dataset_name": "UYT2",
-    "states_header": ["i", "E", "g_tot", "J", "Gamma", "K", "Gamma_rot", "v1", "v2", "v3", "v4", "v5", "v6", "n1", "n2", "n3", "L3", "n4", "L4", "Gamma_vib"],
-    "resolve_vib": ["n1", "n2", "n3", "n4"]
-  },
-  "YO": {
-    "mol_slug": "YO",
-    "iso_slug": "89Y-16O",
-    "dataset_name": "SSYT",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
-  },
   "VO": {
     "mol_slug": "VO",
     "iso_slug": "51V-16O",
@@ -277,14 +114,6 @@
     "iso_slug": "32S-1H",
     "dataset_name": "GYT",
     "states_header": ["i", "E", "g_tot", "J", "tau", "g-factor", "parity", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
-    "resolve_el": ["State"],
-    "resolve_vib": ["v"]
-  },
-  "AlO": {
-    "mol_slug": "AlO",
-    "iso_slug": "27Al-16O",
-    "dataset_name": "ATP",
-    "states_header": ["i", "E", "g_tot", "J", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -330,12 +159,6 @@
     "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_vib": ["v"]
   },
-  "SiH4": {
-    "mol_slug": "SiH4",
-    "iso_slug": "28Si-1H4",
-    "dataset_name": "OY2T",
-    "resolve_vib": ["n1", "n2", "n3", "n4"]
-  },
   "NS": {
     "mol_slug": "NS",
     "iso_slug": "14N-32S",
@@ -343,31 +166,11 @@
     "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
     "resolve_vib": ["v"]
   },
-  "CH3F": {
-    "mol_slug": "CH3F",
-    "iso_slug": "12C-1H3-19F",
-    "dataset_name": "OYKYT",
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"]
-  },
   "SiS": {
     "mol_slug": "SiS",
     "iso_slug": "28Si-32S",
     "dataset_name": "UCTY",
     "resolve_vib": ["v"]
-  },
-  "AsH3": {
-    "mol_slug": "AsH3",
-    "iso_slug": "75As-1H3",
-    "dataset_name": "CYT18",
-    "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "v4", "v5", "v6", "Gvib", "J'", "K", "tau(rot)", "Grot"],
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
-  },
-  "PF3": {
-    "mol_slug": "PF3",
-    "iso_slug": "31P-19F3",
-    "dataset_name": "MCYTY",
-    "states_header": ["i", "E", "g_tot", "J", "G", "J'", "G'", "n1", "n2", "n3", "n4", "n5", "n6", "Gv", "J''", "K", "Pr", "Gr"],
-    "resolve_vib": ["n1", "n2", "n3", "n4", "n5", "n6"]
   },
   "PH": {
     "mol_slug": "PH",
@@ -377,60 +180,11 @@
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
-  "CH3": {
-    "mol_slug": "CH3",
-    "iso_slug": "12C-1H3",
-    "dataset_name": "AYYJ",
-    "states_header": ["i", "E", "g_tot", "J", "+/-", "Gamma", "N(block)", "State", "n1", "n2", "n3", "n4", "l3", "l4", "tau(inv)", "J'", "K", "tau(rot)", "v1", "v2", "v3", "v4", "v5", "v6", "Gamma(vib)"],
-    "resolve_vib": ["n1", "n2", "n3", "n4"]
-  },
   "SiH2": {
     "mol_slug": "SiH2",
     "iso_slug": "28Si-1H2",
     "dataset_name": "CATS",
     "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "Gamma_vib", "Ka", "Kc", "Gamma_rot", "Ci", "n1", "n2", "n3"],
     "resolve_vib": ["v1", "v2", "v3"]
-  },
-  "SiO2": {
-    "mol_slug": "SiO2",
-    "iso_slug": "28Si-16O2",
-    "dataset_name": "OYT3",
-    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "e/f", "v1", "v2lin", "L", "v3", "C", "n1", "n2", "n3", "Gamma_vib", "K", "Gamma_rot"],
-    "resolve_vib": ["v1", "v2lin", "v3"]
-  },
-  "cis-P2H2": {
-    "mol_slug": "cis-P2H2",
-    "iso_slug": "cis-31P2-1H2",
-    "dataset_name": "OY-Cis",
-    "states_header": ["i", "E", "g_tot", "J", "totalSym", "K", "rotSym", "l", "v1", "v2", "v3", "v4", "v5", "v6", "vibSym"],
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
-  },
-  "trans-P2H2": {
-    "mol_slug": "trans-P2H2",
-    "iso_slug": "trans-31P2-1H2",
-    "dataset_name": "OY-Trans",
-    "states_header": ["i", "E", "g_tot", "J", "totalSym", "K", "rotSym", "l", "v1", "v2", "v3", "v4", "v5", "v6", "vibSym"],
-    "resolve_vib": ["v1", "v2", "v3", "v4", "v5", "v6"]
-  },
-  "H3O+": {
-    "mol_slug": "H3O_p",
-    "iso_slug": "1H3-16O_p",
-    "dataset_name": "eXeL",
-    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "n1", "n2", "n3", "l3", "n4", "l4", "Gamma_vib", "K", "Gamma_rot", "C", "v1", "v2", "v3", "v4", "v5", "v6"],
-    "resolve_vib": ["n1", "n2", "n3", "n4"]
-  },
-  "KOH": {
-    "mol_slug": "KOH",
-    "iso_slug": "39K-16O-1H",
-    "dataset_name": "OYT4",
-    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "v1", "v2lin", "L", "v3", "Ci", "n1", "n2", "n3"],
-    "resolve_vib": ["v1", "v2lin", "v3"]
-  },
-  "NaOH": {
-    "mol_slug": "NaOH",
-    "iso_slug": "23Na-16O-1H",
-    "dataset_name": "OYT5",
-    "states_header": ["i", "E", "g_tot", "J", "unc", "Gamma", "v1", "v2lin", "L", "v3", "Ci", "n1", "n2", "n3"],
-    "resolve_vib": ["v1", "v2lin", "v3"]
   }
 }
