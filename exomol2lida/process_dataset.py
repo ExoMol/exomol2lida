@@ -152,7 +152,8 @@ class DatasetProcessor:
                     mask = mask & (chunk[quantum] != val)
             # get rid of all the states with negative integer vibrational quanta
             for quantum in self.resolve_vib:
-                mask = mask & (chunk[quantum].astype('int64') >= 0)
+                mask_neg = chunk.loc[mask, quantum].astype('int64') >= 0
+                mask = mask & mask_neg
             if self.energy_max is not None:
                 mask = mask & (chunk["E"] <= self.energy_max)
             chunk = chunk.loc[mask]
