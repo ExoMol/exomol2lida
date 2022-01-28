@@ -51,6 +51,7 @@ class DatasetProcessor:
     states_chunk_size = STATES_CHUNK_SIZE
     trans_chunk_size = TRANS_CHUNK_SIZE
     discarded_quanta_values = {"*"}
+    include_original_lifetimes = False
 
     def __init__(self, molecule):
         if isinstance(molecule, MoleculeInput):
@@ -73,6 +74,8 @@ class DatasetProcessor:
         self.lumped_states = None
         self.states_map_lumped_to_original = {}
         self.states_map_original_to_lumped = {}
+        # if tau in states_header and self.include_original_lifetimes, populate this:
+        self.states_map_lumped_to_tau = {}
 
         self.lumped_transitions = None
 
@@ -152,7 +155,7 @@ class DatasetProcessor:
                     mask = mask & (chunk.loc[mask, quantum] != val)
             # get rid of all the states with negative integer vibrational quanta
             for quantum in self.resolve_vib:
-                mask = mask & (chunk.loc[mask, quantum].astype('int64') >= 0)
+                mask = mask & (chunk.loc[mask, quantum].astype("int64") >= 0)
             if self.energy_max is not None:
                 mask = mask & (chunk.loc[mask, "E"] <= self.energy_max)
             chunk = chunk.loc[mask]
@@ -254,6 +257,12 @@ class DatasetProcessor:
             self.states_map_original_to_lumped.update(
                 {i: lumped_i for i in original_indices}
             )
+        # and reindex the map between lump ids and original lifetimes, where appropriate
+        if self.include_original_lifetimes and "tau" in self.states_header:
+            self.states_map_lumped_to_tau = {
+                lumped_index_update_map[key]: val
+                for key, val in self.states_map_lumped_to_tau.items()
+            }
         # and save the result as an instance attribute
         self.lumped_states = lumped_states
 
@@ -379,6 +388,11 @@ class DatasetProcessor:
         if lumped_state not in self.states_map_lumped_to_original:
             self.states_map_lumped_to_original[lumped_state] = set()
         self.states_map_lumped_to_original[lumped_state].update(df.index)
+        # now the original lifetimes, if relevant:
+        if self.include_original_lifetimes and "tau" in self.states_header:
+            if lumped_state not in self.states_map_lumped_to_tau:
+                self.states_map_lumped_to_tau[lumped_state] = []
+            self.states_map_lumped_to_tau[lumped_state].extend(df.tau)
 
         # now calculate the lumped state attributes:
         # energy is calculated as the average of energies over the states with
@@ -447,6 +461,15 @@ class DatasetProcessor:
                 cls=MapEncoder,
                 sort_keys=True,
             )
+        if self.include_original_lifetimes and "tau" in self.states_header:
+            with open(self.output_dir / "states_original_tau.json", "w") as fp:
+                json.dump(
+                    self.states_map_lumped_to_tau,
+                    fp,
+                    indent=2,
+                    cls=MapEncoder,
+                    sort_keys=True,
+                )
 
     def _log_states_data(self):
         """Log the lumped states data for the current processing session.
@@ -481,10 +504,17 @@ class DatasetProcessor:
         with open(self.output_dir / "transitions_data.csv", "w") as fp:
             self.lumped_transitions[cols].to_csv(fp, header=True, index=False)
 
-    def process(self):
+    def process(self, include_original_lifetimes=False):
         """Lump states and transitions and log all the outputs into the relevant
         location.
+
+        Parameters
+        ----------
+        include_original_lifetimes : bool, default=False
+            If True, also log the map between the composite state ids and lists
+            of lifetimes of the original states belonging to each composite state.
         """
+        self.include_original_lifetimes = include_original_lifetimes
         # lump and log the states:
         self.lump_states()
         self._log_dataset_metadata()
@@ -493,6 +523,6 @@ class DatasetProcessor:
         # lump and log the transitions (the states file gets the "tau" column, so must
         # be re-logged.)
         self.lump_transitions()
-        self._log_dataset_metadata()
+        self._log_dataset_metadata()  # updated timestamp
         self._log_states_data()
         self._log_transitions_data()

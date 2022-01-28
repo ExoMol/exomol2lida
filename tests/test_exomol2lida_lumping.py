@@ -57,6 +57,7 @@ shared_for_comparison = {
 @pytest.mark.parametrize("chunk_size", (1_000_000, 100_000, 10_000, 5_000))
 def test_states_lumping(monkeypatch, chunk_size):
     processor = DatasetProcessor(molecule=mol_input)
+    processor.include_original_lifetimes = True
     monkeypatch.setattr(processor, "states_path", states_path)
     processor.states_chunk_size = chunk_size
     processor.lump_states()
@@ -94,6 +95,7 @@ def test_states_lumping(monkeypatch, chunk_size):
 def test_trans_lumping(monkeypatch, trans_paths, chunk_size):
     # prepare
     processor = DatasetProcessor(molecule=mol_input)
+    processor.include_original_lifetimes = True
     monkeypatch.setattr(processor, "states_path", states_path)
     processor.states_chunk_size = 1_000_000
     processor.lump_states()
