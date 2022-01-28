@@ -5,5 +5,5 @@ lxml==4.7.1
 pyvalem>=2.4.0
 importlib-resources==1.3.0
 pytest==6.2.5
-exomole>=1.2.4
+exomole>=1.2.5
 black==21.12b0
