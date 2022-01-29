@@ -109,6 +109,8 @@ class DatasetProcessor:
             chunk.loc[:, "J"] = chunk.loc[:, "J"].astype("float64")
             chunk.loc[:, "E"] = chunk.loc[:, "E"].astype("float64")
             chunk.loc[:, "g_tot"] = chunk.loc[:, "g_tot"].astype("float64")
+            if self.include_original_lifetimes and "tau" in self.states_header:
+                chunk.loc[:, "tau"] = chunk.loc[:, "tau"].astype("float64")
             yield chunk.copy(deep=True)
 
     @property
@@ -392,7 +394,7 @@ class DatasetProcessor:
         if self.include_original_lifetimes and "tau" in self.states_header:
             if lumped_state not in self.states_map_lumped_to_tau:
                 self.states_map_lumped_to_tau[lumped_state] = []
-            self.states_map_lumped_to_tau[lumped_state].extend(df.tau.astype("float64"))
+            self.states_map_lumped_to_tau[lumped_state].extend(df.tau)
 
         # now calculate the lumped state attributes:
         # energy is calculated as the average of energies over the states with
