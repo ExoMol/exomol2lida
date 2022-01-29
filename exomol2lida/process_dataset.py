@@ -110,7 +110,9 @@ class DatasetProcessor:
             chunk.loc[:, "E"] = chunk.loc[:, "E"].astype("float64")
             chunk.loc[:, "g_tot"] = chunk.loc[:, "g_tot"].astype("float64")
             if self.include_original_lifetimes and "tau" in self.states_header:
-                chunk.loc[:, "tau"] = chunk.loc[:, "tau"].astype("float64")
+                chunk.loc[:, "tau"] = pd.to_numeric(
+                    chunk.loc[:, "tau"], errors="coerce"
+                )
             yield chunk.copy(deep=True)
 
     @property
