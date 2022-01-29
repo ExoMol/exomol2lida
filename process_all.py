@@ -22,5 +22,5 @@ if __name__ == "__main__":
             process_molecule(mf, "--include-tau" in sys.argv)
         except (MoleculeInputError, FileExistsError, DefParseError) as e:
             print(f"{mf} ABORTED!")
-            print(e)
+            print(f"{type(e).__name__}: {e}")
         print()
