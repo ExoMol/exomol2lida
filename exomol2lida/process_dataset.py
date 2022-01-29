@@ -7,6 +7,7 @@ and its docstrings).
 import json
 from datetime import datetime
 import math
+import pprint
 
 import pandas as pd
 from exomole.read_data import states_chunks, trans_chunks
@@ -14,7 +15,7 @@ from tqdm import tqdm
 
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE, OUTPUT_DIR
 from .read_inputs import MoleculeInput
-from .utils import MapEncoder, EV_IN_CM
+from .utils import EV_IN_CM
 
 
 class DatasetProcessor:
@@ -248,7 +249,6 @@ class DatasetProcessor:
         # each lumped state will get it's own integer index
         lumped_index_orig = list(lumped_states.index)
         lumped_states.reset_index(inplace=True)
-        lumped_states.index = lumped_states.index.astype("int64")
         lumped_index_update_map = dict(zip(lumped_index_orig, lumped_states.index))
         # states_map_lumped_to_original was created (by _process_state_lump helper)
         # with the original multi-index, now I need to update it so it is
@@ -412,6 +412,13 @@ class DatasetProcessor:
             dtype="float64",
         )
 
+    @staticmethod
+    def _log_dict(data, file_path):
+        with open(file_path, "w") as stream:
+            stream.write("data = \\\n")
+            pp = pprint.PrettyPrinter(width=88, compact=True, stream=stream)
+            pp.pprint(data)
+
     def _log_dataset_metadata(self):
         """Log all the relevant metadata for the current processing session.
 
@@ -458,23 +465,15 @@ class DatasetProcessor:
                 self.lumped_states[vib_cols].to_csv(
                     fp, header=True, index=True, index_label="i"
                 )
-        with open(self.output_dir / "states_composite_map.json", "w") as fp:
-            json.dump(
-                self.states_map_lumped_to_original,
-                fp,
-                indent=2,
-                cls=MapEncoder,
-                sort_keys=True,
-            )
+        self._log_dict(
+            self.states_map_lumped_to_original,
+            self.output_dir / "states_composite_map.py",
+        )
         if self.include_original_lifetimes and "tau" in self.states_header:
-            with open(self.output_dir / "states_original_tau.json", "w") as fp:
-                json.dump(
-                    self.states_map_lumped_to_tau,
-                    fp,
-                    indent=2,
-                    cls=MapEncoder,
-                    sort_keys=True,
-                )
+            self._log_dict(
+                self.states_map_lumped_to_tau,
+                self.output_dir / "states_original_tau.py",
+            )
 
     def _log_states_data(self):
         """Log the lumped states data for the current processing session.
