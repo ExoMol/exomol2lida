@@ -51,7 +51,7 @@ class DatasetProcessor:
     states_chunk_size = STATES_CHUNK_SIZE
     trans_chunk_size = TRANS_CHUNK_SIZE
     discarded_quanta_values = {"*"}
-    include_original_lifetimes = False
+    include_original_lifetimes = None
 
     def __init__(self, molecule):
         if isinstance(molecule, MoleculeInput):
@@ -248,6 +248,7 @@ class DatasetProcessor:
         # each lumped state will get it's own integer index
         lumped_index_orig = list(lumped_states.index)
         lumped_states.reset_index(inplace=True)
+        lumped_states.index = lumped_states.index.astype("int64")
         lumped_index_update_map = dict(zip(lumped_index_orig, lumped_states.index))
         # states_map_lumped_to_original was created (by _process_state_lump helper)
         # with the original multi-index, now I need to update it so it is
