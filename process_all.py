@@ -14,6 +14,8 @@ def process_molecule(mol_formula, include_original_lifetimes=True):
 
 
 if __name__ == "__main__":
+    allowed_args = {"--include-tau"}
+    assert set(sys.argv[1:]).issubset(allowed_args)
     # read all the molecule formulas from the input file:
     with open(INPUT_DIR / "molecules.json", "r") as fp:
         mol_formulas = list(json.load(fp))
