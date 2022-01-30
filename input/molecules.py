@@ -1,4 +1,4 @@
-{
+data = {
   "CO": {
     "mol_slug": "CO",
     "iso_slug": "12C-16O",
@@ -9,7 +9,10 @@
     "mol_slug": "NO",
     "iso_slug": "14N-16O",
     "dataset_name": "XABC",
-    "states_header": ["i", "E", "g_tot", "J", "dE", "tau", "g_J", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega", "label", "E_duo"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "dE", "tau", "g_J", "+/-", "e/f", "State", "v", "Lambda",
+      "Sigma", "Omega", "label", "E_duo"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -57,7 +60,10 @@
     "mol_slug": "SiH",
     "iso_slug": "28Si-1H",
     "dataset_name": "SiGHTLY",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g_factor", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "g_factor", "+/-", "e/f", "State", "v", "Lambda",
+      "Sigma", "Omega"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -84,14 +90,19 @@
     "mol_slug": "H3_p",
     "iso_slug": "1H3_p",
     "dataset_name": "MiZATeP",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "p", "Sym", "v1", "v2", "l2", "G", "U", "K"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "p", "Sym", "v1", "v2", "l2", "G", "U", "K"
+    ],
     "resolve_vib": ["v1", "v2"]
   },
   "CN": {
     "mol_slug": "CN",
     "iso_slug": "12C-14N",
     "dataset_name": "Trihybrid",
-    "states_header": ["i", "E", "g_tot", "J", "unc", "tau", "g", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega", "Source", "E_Duo"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "unc", "tau", "g", "+/-", "e/f", "State", "v", "Lambda",
+      "Sigma", "Omega", "Source", "E_Duo"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -105,7 +116,10 @@
     "mol_slug": "VO",
     "iso_slug": "51V-16O",
     "dataset_name": "VOMYT",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "+/-", "e/f", "State", "v", "Lambda", "Sigma",
+      "Omega"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -113,7 +127,10 @@
     "mol_slug": "SH",
     "iso_slug": "32S-1H",
     "dataset_name": "GYT",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g-factor", "parity", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "g-factor", "parity", "e/f", "State", "v",
+      "Lambda", "Sigma", "Omega"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -134,7 +151,10 @@
     "mol_slug": "CaO",
     "iso_slug": "40Ca-16O",
     "dataset_name": "VBATHY",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "/-", "e/f", "State", "v", "Lambda", "Sigma",
+      "Omega"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -148,7 +168,10 @@
     "mol_slug": "PS",
     "iso_slug": "31P-32S",
     "dataset_name": "POPS",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda",
+      "Sigma", "Omega"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -156,14 +179,20 @@
     "mol_slug": "PO",
     "iso_slug": "31P-16O",
     "dataset_name": "POPS",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda",
+      "Sigma", "Omega"
+    ],
     "resolve_vib": ["v"]
   },
   "NS": {
     "mol_slug": "NS",
     "iso_slug": "14N-32S",
     "dataset_name": "SNaSH",
-    "states_header": ["i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda", "Sigma", "Omega"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "tau", "g_lande", "+/-", "e/f", "State", "v", "Lambda",
+      "Sigma", "Omega"
+    ],
     "resolve_vib": ["v"]
   },
   "SiS": {
@@ -176,7 +205,9 @@
     "mol_slug": "PH",
     "iso_slug": "31P-1H",
     "dataset_name": "LaTY",
-    "states_header": ["i", "E", "g_tot", "J", "g_lande", "+/-", "e/f", "State", "v", "N"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "g_lande", "+/-", "e/f", "State", "v", "N"
+    ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"]
   },
@@ -184,7 +215,10 @@
     "mol_slug": "SiH2",
     "iso_slug": "28Si-1H2",
     "dataset_name": "CATS",
-    "states_header": ["i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "Gamma_vib", "Ka", "Kc", "Gamma_rot", "Ci", "n1", "n2", "n3"],
+    "states_header": [
+      "i", "E", "g_tot", "J", "Gamma", "v1", "v2", "v3", "Gamma_vib", "Ka", "Kc",
+      "Gamma_rot", "Ci", "n1", "n2", "n3"
+    ],
     "resolve_vib": ["v1", "v2", "v3"]
   }
 }

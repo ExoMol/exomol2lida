@@ -1,8 +1,8 @@
 """
-Module reading the *input/molecules.json* input file and performing some validation and
-sanitization on top of the input configuration data.
+Module reading the dict from *input/molecules.py* input file and performing some
+validation and sanitization on top of the input configuration data.
 
-The *molecules.json* is expected to hold the following entries:
+The ``molecules.data`` is expected to hold the following entries:
 "molecule_formula": {
   "mol_slug": str,
   "iso_slug": str,
@@ -39,18 +39,17 @@ The *molecules.json* is expected to hold the following entries:
 A `MoleculeInput` class instantiated without exceptions signals data without
 inconsistencies and ready to be processed into the Lida data product. All the possible
 consistency checks are performed upon MoleculeInput instantiation.
-The `MoleculeInput` instance will contain all the original *molecules.json* fields per
+The `MoleculeInput` instance will contain all the original ``molecules.data`` fields per
 each `molecule_formula` saved as instance attributes, as well as couple of additional
 attributes, such as `self.def_path`, `self.states_path` and `self.trans_paths`.
 """
 
-import json
 from pathlib import Path
 
 from exomole.read_def import DefParser, DefParseError
 from exomole.utils import get_num_columns
 
-from config.config import EXOMOL_DATA_DIR, INPUT_DIR
+from config.config import EXOMOL_DATA_DIR
 from .exceptions import MoleculeInputError
 from .utils import EV_IN_CM
 
@@ -59,7 +58,7 @@ class MoleculeInput:
     """Class representing Molecule Inputs.
 
     Loads all the attributes for a single `molecule_formula` from the
-    *inputs/molecules.json*, does whole lot of validation and preparation for the
+    ``input.molecules.data``, does whole lot of validation and preparation for the
     states lumping.
 
     Parameters
@@ -67,8 +66,8 @@ class MoleculeInput:
     molecule_formula : str
     kwargs : dict, optional
         If not supplied, the class will load all the necessary arguments from the
-        ``INPUT_DIR/molecules.json``.
-        If omitted, all the necessary arguments (see the structure of ``molecules.json``
+        ``input.molecules.data``.
+        If omitted, all the necessary arguments (see the structure of ``molecules.data``
         input file discussed in the docstring for `read_inputs` module) need to be
         passed explicitly.
 
@@ -120,8 +119,8 @@ class MoleculeInput:
 
         # populate the attributes:
         if not len(kwargs):
-            with open(INPUT_DIR / "molecules.json", "r") as fp:
-                kwargs = json.load(fp)[molecule_formula]
+            from input.molecules import data as molecules
+            kwargs = molecules[molecule_formula]
         self.raw_input = kwargs.copy()
         for attr, val in kwargs.items():
             setattr(self, attr, val)
@@ -193,7 +192,7 @@ class MoleculeInput:
 
         # get .states column names:
         if self.states_header is not None:
-            # some basic sanitation of the states header read from input json:
+            # some basic sanitation of the states header read from input:
             if self.states_header[:4] != ["i", "E", "g_tot", "J"]:
                 raise MoleculeInputError(
                     f"Unexpected states_header for {molecule_formula}"
@@ -268,7 +267,7 @@ class MoleculeInput:
 
 def get_all_inputs(bypass_exceptions=False, verbose=True):
     """Get the `MoleculeInput` instances for all formulas specified in the input
-    json file.
+    file.
 
     Parameters
     ----------
@@ -279,8 +278,7 @@ def get_all_inputs(bypass_exceptions=False, verbose=True):
     -------
     dict[str, Optional[MoleculeInput]]
     """
-    with open(INPUT_DIR / "molecules.json", "r") as fp:
-        inputs_dict = json.load(fp)
+    from input.molecules import data as inputs_dict
     all_inputs = {}
     num_exceptions_raised = 0
     for molecule_formula in inputs_dict:

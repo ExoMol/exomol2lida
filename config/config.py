@@ -4,7 +4,6 @@ file_dir = Path(__file__).parent
 project_root = file_dir.parent
 
 # ********************************** PATHS ******************************************* #
-INPUT_DIR = project_root / "input"
 OUTPUT_DIR = project_root / "output"
 EXOMOL_DATA_DIR = None
 

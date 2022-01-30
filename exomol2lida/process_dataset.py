@@ -1,13 +1,13 @@
 """
 Module with functionality for processing ExoMol datasets into Lida data
 
-The processing is controlled by the input/molecules.json (see `read_inputs` module
+The processing is controlled by the dict in input/molecules.py (see `read_inputs` module
 and its docstrings).
 """
+import math
 import json
 from datetime import datetime
-import math
-import pprint
+from pprint import pprint
 
 import pandas as pd
 from exomole.read_data import states_chunks, trans_chunks
@@ -416,8 +416,7 @@ class DatasetProcessor:
     def _log_dict(data, file_path):
         with open(file_path, "w") as stream:
             stream.write("data = \\\n")
-            pp = pprint.PrettyPrinter(width=88, compact=True, stream=stream)
-            pp.pprint(data)
+            pprint(data, width=88, compact=True, stream=stream)
 
     def _log_dataset_metadata(self):
         """Log all the relevant metadata for the current processing session.
@@ -447,8 +446,8 @@ class DatasetProcessor:
         not log anything silently.
         The data are logged into the output folder in the .csv format under several
         files, containing the electronic and vibrational resolved quanta, and also a
-        .json file mapping IDs of the lumped states back to the original ids of the
-        ExoMol states.
+        dict (called `data`) in states_composite_map.py file, mapping IDs of the lumped
+        states back to the original ids of the ExoMol states.
         """
         if self.lumped_states is None:
             return
