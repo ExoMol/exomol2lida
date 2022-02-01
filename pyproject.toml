@@ -2,4 +2,4 @@
 extend-exclude = "input/|output/"
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules"
+addopts = "--doctest-modules --ignore=output/"

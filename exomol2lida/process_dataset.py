@@ -454,7 +454,7 @@ class DatasetProcessor:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         el_cols = self.resolve_el
         if len(el_cols):
-            with open(self.output_dir / "states_electronic.csv", "w") as fp:
+            with open(self.output_dir / "states_electronic_raw.csv", "w") as fp:
                 self.lumped_states[el_cols].to_csv(
                     fp, header=True, index=True, index_label="i"
                 )

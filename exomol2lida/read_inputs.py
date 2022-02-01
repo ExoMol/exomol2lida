@@ -120,7 +120,9 @@ class MoleculeInput:
         # populate the attributes:
         if not len(kwargs):
             from input.molecules import data as molecules
+
             kwargs = molecules[molecule_formula]
+
         self.raw_input = kwargs.copy()
         for attr, val in kwargs.items():
             setattr(self, attr, val)
@@ -279,6 +281,7 @@ def get_all_inputs(bypass_exceptions=False, verbose=True):
     dict[str, Optional[MoleculeInput]]
     """
     from input.molecules import data as inputs_dict
+
     all_inputs = {}
     num_exceptions_raised = 0
     for molecule_formula in inputs_dict:

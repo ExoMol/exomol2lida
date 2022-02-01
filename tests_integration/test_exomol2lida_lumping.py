@@ -13,7 +13,7 @@ from exomol2lida.process_dataset import DatasetProcessor
 test_resources_dir = Path(__file__).parent / "resources"
 
 mol_input = MoleculeInput(
-    molecule_formula="HCN",
+    molecule_formula="FOO",
     **{
         "mol_slug": "HCN",
         "iso_slug": "1H-12C-14N",
