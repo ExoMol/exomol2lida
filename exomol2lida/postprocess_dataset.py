@@ -36,19 +36,39 @@ indicates that the post-processing happened already before, in which case an exc
 is raised.
 """
 
-import json
 import re
-from datetime import datetime
 
 import pandas as pd
 from pyvalem.states import MolecularTermSymbol
 from pyvalem.states.molecular_term_symbol import MolecularTermSymbolError
+from tqdm import tqdm
 
 from config.config import OUTPUT_DIR
 from .exceptions import DatasetPostProcessorError, CouldNotParseState
 
 
-special_cases = {}
+special_cases = {
+    "NaH": {("X",): "X(1SIGMA+)", ("A",): "A(1SIGMA+)"},
+    "CN": {("X",): "X(?)", ("A",): "A(?)", ("B",): "B(?)"},
+    "SiH": {("a4Sigma",): "a(4SIGMA?)", ("B2Sigma",): "B(2SIGMA?)"},
+    "VO": {
+        ("b2Gamma",): "?",
+        ("0",): "?",
+        ("X",): "?",
+        ("a2",): "?",
+        ("Ap",): "?",
+        ("A",): "?",
+        ("b2",): "?",
+        ("c2",): "?",
+        ("d2",): "?",
+        ("B",): "?",
+        ("e2",): "?",
+        ("C",): "?",
+        ("f2",): "?",
+        ("D",): "?",
+        ("g2",): "?",
+    },
+}
 
 
 class DatasetPostProcessor:
@@ -185,10 +205,37 @@ class DatasetPostProcessor:
         return f"{label}({match.group('spin')}{match.group('lambda').upper()}{sym})"
 
     def _log_states_metadata(self):
+        """Log the post-processed electronic states into the relevant table.
+
+        The states are saved into the ``outputs/{mol_formula}/states_electronic.csv``,
+        with two columns: state index ``i`` and state ``State``.
+
+        Must be called only after `self.states_electronic` is populated.
+        """
         assert self.states_electronic is not None, "Defense, should never happen"
         self.states_electronic.to_csv(self.states_electronic_path)
 
     def postprocess(self):
+        """The main method for post-processing electronic states.
+
+        Populates the self.states_electronic attribute with pd.DataFrame with a single
+        column ``"State"`` and with values consisting of `pyvalem`-valid
+        molecular term symbols.
+
+        The dataframe gets also logged as ``states_electronic.csv`` into the relevant
+        output directory.
+
+        If the dataset under ``self.mol_formula`` does not resolve electronic states
+        (does not include ``states_electronic_raw.csv``), this method does nothing.
+
+        Raises
+        ------
+        DatasetPostProcessorError
+            If the raw electronic states could no be parsed into pyvalem-compatible
+            state strings by the default parsing method. This can be overcame by
+            adding the pyvalem state strings into the `special_cases` ``dict``, as
+            prompted by the error message.
+        """
         if self.states_electronic_raw is None:
             return
         raw_states = [
@@ -216,7 +263,9 @@ class DatasetPostProcessor:
         self.states_electronic = pd.DataFrame(
             index=self.states_electronic_raw.index, columns=["State"]
         )
-        for i in self.states_electronic_raw.index:
+        for i in tqdm(
+            self.states_electronic_raw.index, desc=f"{self.mol_formula} postprocessing"
+        ):
             self.states_electronic.at[i, "State"] = map_raw_to_valid[
                 tuple(self.states_electronic_raw.loc[i])
             ]
