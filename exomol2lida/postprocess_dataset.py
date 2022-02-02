@@ -49,8 +49,13 @@ from .exceptions import DatasetPostProcessorError, CouldNotParseState
 
 special_cases = {
     "NaH": {("X",): "X(1SIGMA+)", ("A",): "A(1SIGMA+)"},
-    "CN": {("X",): "X(?)", ("A",): "A(?)", ("B",): "B(?)"},
-    "SiH": {("a4Sigma",): "a(4SIGMA?)", ("B2Sigma",): "B(2SIGMA?)"},
+    "CN": {
+        ("X",): "X(2SIGMA+)",
+        ("A",): "A(2PI)",
+        ("B",): "B(2SIGMA+)"},
+    "SiH": {
+        ("a4Sigma",): "a(4SIGMA+)",  # missing +/- ?
+        ("B2Sigma",): "B(2SIGMA?)"},  # missing +/- ?
     "VO": {
         ("b2Gamma",): "?",
         ("0",): "?",
