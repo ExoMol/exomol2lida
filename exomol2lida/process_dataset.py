@@ -566,7 +566,7 @@ def process_molecule(
     Parameters
     ----------
     mol_formula : str
-        Molecular formula, must be among the keys in ``input.molecules.data``
+        Molecular formula, must be among the keys in ``input.molecules.molecules``
         dictionary.
     include_original_lifetimes : bool, default=False
         If True, also a dictionary mapping the composite state ids to lists of lifetimes

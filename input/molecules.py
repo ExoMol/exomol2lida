@@ -1,4 +1,4 @@
-data = {
+molecules = {
   "CO": {
     "mol_slug": "CO",
     "iso_slug": "12C-16O",
@@ -66,10 +66,6 @@ data = {
     ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"],
-    "mapping_el": {
-      ("a4Sigma",): "a(4SIGMA-)",
-      ("B2Sigma",): "B(2SIGMA-)",
-    },
   },
   "NaH": {
     "mol_slug": "NaH",
@@ -77,10 +73,6 @@ data = {
     "dataset_name": "Rivlin",
     "resolve_el": ["X/A"],
     "resolve_vib": ["v"],
-    "mapping_el": {
-      ("X",): "X(1SIGMA+)",
-      ("A",): "A(1SIGMA+)"
-    }
   },
   "MgH": {
     "mol_slug": "MgH",
@@ -113,11 +105,6 @@ data = {
     ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"],
-    "mapping_el": {
-      ("X",): "X(2SIGMA+)",
-      ("A",): "A(2PI)",
-      ("B",): "B(2SIGMA+)"
-    }
   },
   "NaCl": {
     "mol_slug": "NaCl",
@@ -136,22 +123,6 @@ data = {
     "resolve_el": ["State"],
     "resolve_vib": ["v"],
     "only_without": {"State": "0"},
-    "mapping_el": {
-      ("b2Gamma",): "b(2GAMMA)",
-      ("X",): "X(4SIGMA-)",
-      ("a2",): "a(2SIGMA-)",
-      ("Ap",): "A'(4PHI)",
-      ("A",): "A(4PI)",
-      ("b2",): "b(2GAMMA)",
-      ("c2",): "c(2DELTA)",
-      ("d2",): "d(2SIGMA+)",
-      ("B",): "B(4PI)",
-      ("e2",): "e(2PHI)",
-      ("C",): "C(4SIGMA-)",
-      ("f2",): "f(2PI)",
-      ("D",): "D(4DELTA)",
-      ("g2",): "g(2PI)",
-    },
   },
   "SH": {
     "mol_slug": "SH",

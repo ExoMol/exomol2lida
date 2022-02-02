@@ -6,7 +6,7 @@ if __name__ == "__main__":
     mol_formula = sys.argv[1]
 
     if mol_formula.lower() == "all":
-        from input.molecules import data as mol_formulas
+        from input.molecules import molecules as mol_formulas
 
         for mf in mol_formulas:
             postprocess_molecule(mf, raise_exceptions=False)

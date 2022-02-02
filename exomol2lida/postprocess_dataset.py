@@ -23,14 +23,14 @@ The file after post-processing will be in the form of a two-column csv, with col
 names ``"i"`` and ``"State"``, and with all the values in the ``"State"`` column being
 valid pyvalem `MolecularTermSymbol` state strings.
 The rules of post-processing are:
-* Have a look at ``input.molecules.data["<mol_formula>"]["mapping_el"]`` dict, and if
-  the mapping is found, apply it to all the rows of the original `states_electronic_raw`
+* Have a look at ``input.mapping_el.mapping_el["<mol_formula>"]`` dict, and if the
+  mapping is found, apply it to all the rows of the original `states_electronic_raw`
   dataframe.
 * If custom rules do not exist, apply the default parsing function.
 * Check if all the new values under the State column are pyvalem-parseable.
 * If some are not, raise the DatasetPostProcessorError with the original state strings
   which could not be parsed, prompting to implement custom rules into the
-  ``input/molecules.py`` input file.
+  ``input/mapping_el.py`` input file.
 
 The existence of both `states_electronic_raw.csv` and `states_electronic.csv`
 indicates that the post-processing happened already before, in which case an exception
@@ -222,12 +222,10 @@ class DatasetPostProcessor:
         failed_to_parse = []
         for raw_state in raw_states:
             # look into the special cases table:
-            from input.molecules import data as input_data
+            from input.mapping_el import mapping_el as special_cases
 
             valid_state = (
-                input_data.get(self.mol_formula, {})
-                .get("mapping_el", {})
-                .get(raw_state, None)
+                special_cases.get(self.mol_formula, {}).get(raw_state, None)
             )
             try:
                 if valid_state is None:
@@ -239,7 +237,7 @@ class DatasetPostProcessor:
         if failed_to_parse:
             raise DatasetPostProcessorError(
                 f"Add pyvalem-valid MolecularTermSymbol strings into "
-                f"input.molecules.data['{self.mol_formula}']['mapping_el'] under the "
+                f"input.mapping_el.mapping_el['{self.mol_formula}'] under the "
                 f"following keys: {str(failed_to_parse)[1:-1]}."
             )
         # now I have pyvalem-valid molecular term symbols, so just re-build the table

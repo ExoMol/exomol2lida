@@ -2,7 +2,6 @@ import sys
 from functools import partial
 
 from exomol2lida.process_dataset import process_molecule
-from input.molecules import data as mol_formulas
 
 if __name__ == "__main__":
     mol_formula = sys.argv[1]
@@ -18,6 +17,8 @@ if __name__ == "__main__":
     )
 
     if mol_formula.lower() == "all":
+        from input.molecules import molecules as mol_formulas
+
         for mf in mol_formulas:
             proc_mol(mf)
     else:

@@ -13,7 +13,6 @@ The ``molecules.data`` is expected to hold the following entries:
   "energy_max": number (optional), in [eV],
   "only_with": dict[str, str] (optional),
   "only_without": dict[str, str] (optional),
-  "mapping_el": dict[str, str] (optional)
 }
 
 `molecule_formula`: Identifier for the Lida database, does not have to correspond
@@ -41,14 +40,6 @@ The ``molecules.data`` is expected to hold the following entries:
     the VO .states contains some values ``"0"`` in the ``States`` column, probably
     indicating unassigned states. These will be ignored by setting
     ``"only_without": {"State": "0"}``
-`mapping_el`: This is a map between the values of a single (distinct) row of the
-    ``states[resolved_el]`` (without index, in the ``tuple`` form), and pyvalem-valid
-    state string. This is not used by the dataset processing routine, but only by the
-    post-processing routine. There is a default parser for electronic states built in
-    the `DatasetPostProcessor`, this parameter will typically be only filled after
-    processing has been done, and after the post-processor complains and prompts the
-    user to add the mapping for the cases which could not be parsed by the default
-    parser.
 
 A `MoleculeInput` class instantiated without exceptions signals data without
 inconsistencies and ready to be processed into the Lida data product. All the possible
@@ -72,7 +63,7 @@ class MoleculeInput:
     """Class representing Molecule Inputs.
 
     Loads all the attributes for a single `molecule_formula` from the
-    ``input.molecules.data``, does whole lot of validation and preparation for the
+    ``input.molecules.molecules``, does whole lot of validation and preparation for the
     states lumping.
 
     Parameters
@@ -80,7 +71,7 @@ class MoleculeInput:
     molecule_formula : str
     kwargs : dict, optional
         If not supplied, the class will load all the necessary arguments from the
-        ``input.molecules.data``.
+        ``input.molecules.molecules``.
         If omitted, all the necessary arguments (see the structure of ``molecules.data``
         input file discussed in the docstring for `read_inputs` module) need to be
         passed explicitly.
@@ -138,7 +129,7 @@ class MoleculeInput:
 
         # populate the attributes:
         if not len(kwargs):
-            from input.molecules import data as molecules
+            from input.molecules import molecules as molecules
 
             kwargs = molecules[molecule_formula]
 
@@ -299,7 +290,7 @@ def get_all_inputs(bypass_exceptions=False, verbose=True):
     -------
     dict[str, Optional[MoleculeInput]]
     """
-    from input.molecules import data as inputs_dict
+    from input.molecules import molecules as inputs_dict
 
     all_inputs = {}
     num_exceptions_raised = 0
