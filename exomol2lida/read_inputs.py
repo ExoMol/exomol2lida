@@ -11,7 +11,9 @@ The ``molecules.data`` is expected to hold the following entries:
   "resolve_el": list[str] (optional if `resolve_vib` not specified),
   "resolve_vib": list[str] (optional if `resolve_el` not specified),
   "energy_max": number (optional), in [eV],
-  "only_with": dict[str, str] (optional)
+  "only_with": dict[str, str] (optional),
+  "only_without": dict[str, str] (optional),
+  "mapping_el": dict[str, str] (optional)
 }
 
 `molecule_formula`: Identifier for the Lida database, does not have to correspond
@@ -35,6 +37,18 @@ The ``molecules.data`` is expected to hold the following entries:
     ``"HCN": {..., "only_with": {"iso": "HNC"}, ...}`` will pre-filter the dataset and
     remove all the states (and their transitions) with ``"iso"`` column values
     (in .states file) not equaling ``"HNC"``.
+`only_without`: Allows for similar pre-filtering as the `only_with`. As an example,
+    the VO .states contains some values ``"0"`` in the ``States`` column, probably
+    indicating unassigned states. These will be ignored by setting
+    ``"only_without": {"State": "0"}``
+`mapping_el`: This is a map between the values of a single (distinct) row of the
+    ``states[resolved_el]`` (without index, in the ``tuple`` form), and pyvalem-valid
+    state string. This is not used by the dataset processing routine, but only by the
+    post-processing routine. There is a default parser for electronic states built in
+    the `DatasetPostProcessor`, this parameter will typically be only filled after
+    processing has been done, and after the post-processor complains and prompts the
+    user to add the mapping for the cases which could not be parsed by the default
+    parser.
 
 A `MoleculeInput` class instantiated without exceptions signals data without
 inconsistencies and ready to be processed into the Lida data product. All the possible
@@ -95,7 +109,11 @@ class MoleculeInput:
     Raises
     ------
     MoleculeInputError
+        If any inconsistencies are detected in the molecule input.
     DefParseError
+        If the `MoleculeInput` relies on the information from the .def file (such as
+        if the states_header is not explicitly provided in the input file) and the .def
+        file cannot be parsed, this error is raised.
     """
 
     def __init__(self, molecule_formula, **kwargs):
@@ -116,6 +134,7 @@ class MoleculeInput:
         self.resolve_vib = []
         self.energy_max = float("inf")
         self.only_with = {}
+        self.only_without = {}
 
         # populate the attributes:
         if not len(kwargs):

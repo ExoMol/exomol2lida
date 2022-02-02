@@ -4,16 +4,19 @@ Module with functionality for processing ExoMol datasets into Lida data
 The processing is controlled by the dict in input/molecules.py (see `read_inputs` module
 and its docstrings).
 """
-import math
 import json
+import math
 from datetime import datetime
 from pprint import pprint
 
 import pandas as pd
+from exomole.exceptions import DefParseError
 from exomole.read_data import states_chunks, trans_chunks
 from tqdm import tqdm
 
 from config.config import STATES_CHUNK_SIZE, TRANS_CHUNK_SIZE, OUTPUT_DIR
+from .exceptions import MoleculeInputError
+from .postprocess_dataset import postprocess_molecule
 from .read_inputs import MoleculeInput
 from .utils import EV_IN_CM
 
@@ -47,6 +50,19 @@ class DatasetProcessor:
         Populates the `lumped_transitions` DataFrame.
     process
         Lump states and transitions and log the data.
+
+    Raises
+    ------
+    MoleculeInputError
+        If any inconsistencies detected in the molecule input.
+    DefParseError
+        If the MoleculeInput relies on the information from the .def file (such as
+        if the states_header is not explicitly provided in the input file) and the .def
+        file cannot be parsed, this error is raised.
+    FileExistsError
+        If the molecule passed already has an entry in the OUTPUT_DIR, meaning that
+        it already has been processed. To reprocess the data, the output/{mol_formula}
+        needs to first be manually removed.
     """
 
     states_chunk_size = STATES_CHUNK_SIZE
@@ -68,6 +84,7 @@ class DatasetProcessor:
         self.resolve_el = molecule_input.resolve_el
         self.resolve_vib = molecule_input.resolve_vib
         self.only_with = molecule_input.only_with
+        self.only_without = molecule_input.only_without
         self.energy_max = molecule_input.energy_max
 
         self.resolved_quanta = self.resolve_el + self.resolve_vib
@@ -155,6 +172,8 @@ class DatasetProcessor:
             mask = pd.Series(True, index=chunk.index)
             for quantum, val in self.only_with.items():
                 mask = mask & (chunk.loc[mask, quantum] == val)
+            for quantum, val in self.only_without.items():
+                mask = mask & (chunk.loc[mask, quantum] != val)
             for quantum in self.resolved_quanta:
                 for val in self.discarded_quanta_values:
                     mask = mask & (chunk.loc[mask, quantum] != val)
@@ -529,3 +548,55 @@ class DatasetProcessor:
         self._log_dataset_metadata()  # updated timestamp
         self._log_states_data()
         self._log_transitions_data()
+
+
+def process_molecule(
+    mol_formula,
+    include_original_lifetimes=False,
+    postprocess=False,
+    raise_exceptions=True,
+):
+    """A top-level function for processing the exomol dataset belonging to a single
+    molecule.
+
+    The dataset details are specified in the ``input/molecules.py`` configuration file.
+
+    See the `DatasetProcessor` class for further documentation on errors etc.
+
+    Parameters
+    ----------
+    mol_formula : str
+        Molecular formula, must be among the keys in ``input.molecules.data``
+        dictionary.
+    include_original_lifetimes : bool, default=False
+        If True, also a dictionary mapping the composite state ids to lists of lifetimes
+        of the original states (where available) will be logged into outputs.
+    postprocess : bool, default=False
+        If True, also runs the post-processing on the generated output. This is to turn
+        the raw electronic states (if resolved) into the pyvalem-parsable state strings.
+    raise_exceptions : bool, default=True
+        If False, any exceptions raised by the `DataProcessor` constructor or its
+        `process` method will be caught and printed to stdout, instead of halting the
+        program.
+
+    Raises
+    ------
+    MoleculeInputError
+    DefParseError
+    FileExistsError
+    """
+    if raise_exceptions:
+        mol_processor = DatasetProcessor(mol_formula)
+        mol_processor.process(include_original_lifetimes=include_original_lifetimes)
+    else:
+        try:
+            mol_processor = DatasetProcessor(mol_formula)
+            mol_processor.process(include_original_lifetimes=include_original_lifetimes)
+        except (MoleculeInputError, DefParseError) as e:
+            print(f"{mol_formula}: PROCESSING ABORTED: {type(e).__name__}: {e}")
+        except FileExistsError as e:
+            print(f"{mol_formula}: PROCESSED ALREADY: {type(e).__name__}: {e}")
+    if postprocess:
+        postprocess_molecule(mol_formula, raise_exceptions=raise_exceptions)
+    else:
+        print()

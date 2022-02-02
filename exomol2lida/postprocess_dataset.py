@@ -47,35 +47,6 @@ from config.config import OUTPUT_DIR
 from .exceptions import DatasetPostProcessorError, CouldNotParseState
 
 
-special_cases = {
-    "NaH": {("X",): "X(1SIGMA+)", ("A",): "A(1SIGMA+)"},
-    "CN": {
-        ("X",): "X(2SIGMA+)",
-        ("A",): "A(2PI)",
-        ("B",): "B(2SIGMA+)"},
-    "SiH": {
-        ("a4Sigma",): "a(4SIGMA+)",  # missing +/- ?
-        ("B2Sigma",): "B(2SIGMA?)"},  # missing +/- ?
-    "VO": {
-        ("b2Gamma",): "?",
-        ("0",): "?",
-        ("X",): "?",
-        ("a2",): "?",
-        ("Ap",): "?",
-        ("A",): "?",
-        ("b2",): "?",
-        ("c2",): "?",
-        ("d2",): "?",
-        ("B",): "?",
-        ("e2",): "?",
-        ("C",): "?",
-        ("f2",): "?",
-        ("D",): "?",
-        ("g2",): "?",
-    },
-}
-
-
 class DatasetPostProcessor:
     """Class post-processing the ``exomol2lida`` outputs into LIDA-ready files,
     expected by the LIDA's database populating logic.
@@ -250,7 +221,13 @@ class DatasetPostProcessor:
         failed_to_parse = []
         for raw_state in raw_states:
             # look into the special cases table:
-            valid_state = special_cases.get(self.mol_formula, {}).get(raw_state, None)
+            from input.molecules import data as input_data
+
+            valid_state = (
+                input_data.get(self.mol_formula, {})
+                .get("mapping_el", {})
+                .get(raw_state, None)
+            )
             try:
                 if valid_state is None:
                     valid_state = self._parse_state_default(raw_state)
@@ -276,3 +253,34 @@ class DatasetPostProcessor:
             ]
         # log the results and fuck off...
         self._log_states_metadata()
+
+
+def postprocess_molecule(mol_formula, raise_exceptions=True):
+    """A top-level function for post-processing exomol dataset which has already been
+    processed (lumped and all).
+
+    See the `DatasetPostProcessor` class for further documentation on errors etc.
+
+    Parameters
+    ----------
+    mol_formula : str
+        Molecular formula, must be among the subdirectories of ``config.OUTPUT_DIR``.
+    raise_exceptions : bool
+        If False, any exceptions raised by the `DataPostProcessor` constructor or its
+        `postprocess` method will be caught and printed to stdout, instead of halting
+        the program.
+
+    Raises
+    ------
+    DatasetPostProcessorError
+    """
+    if raise_exceptions:
+        mol_postprocessor = DatasetPostProcessor(mol_formula)
+        mol_postprocessor.postprocess()
+    else:
+        try:
+            mol_postprocessor = DatasetPostProcessor(mol_formula)
+            mol_postprocessor.postprocess()
+        except (DatasetPostProcessorError,) as e:
+            print(f"{mol_formula}: POST-PROCESSING ABORTED: {type(e).__name__}: {e}")
+    print()
