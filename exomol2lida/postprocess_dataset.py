@@ -1,5 +1,6 @@
 """
-This module contains the DatasetPostProcessor class.
+This module contains the `DatasetPostProcessor` class and the top-level
+`postprocess_molecule` function.
 
 The idea of post-processing the data is to end up with the *exact* form needed by
 the LIDA database.
@@ -22,14 +23,14 @@ The file after post-processing will be in the form of a two-column csv, with col
 names ``"i"`` and ``"State"``, and with all the values in the ``"State"`` column being
 valid pyvalem `MolecularTermSymbol` state strings.
 The rules of post-processing are:
-* Have a look at `custom_rules` dict for the post-processing function for the current
-  molecule, and if found, apply it to all the rows of the original
-  `states_electronic_raw` dataframe
-* If custom rules do not exist, apply the default rule
-* Check if all the new values under the State column are pyvalem-parseable
+* Have a look at ``input.molecules.data["<mol_formula>"]["mapping_el"]`` dict, and if
+  the mapping is found, apply it to all the rows of the original `states_electronic_raw`
+  dataframe.
+* If custom rules do not exist, apply the default parsing function.
+* Check if all the new values under the State column are pyvalem-parseable.
 * If some are not, raise the DatasetPostProcessorError with the original state strings
   which could not be parsed, prompting to implement custom rules into the
-  ``special_cases`` dict.
+  ``input/molecules.py`` input file.
 
 The existence of both `states_electronic_raw.csv` and `states_electronic.csv`
 indicates that the post-processing happened already before, in which case an exception
@@ -238,7 +239,7 @@ class DatasetPostProcessor:
         if failed_to_parse:
             raise DatasetPostProcessorError(
                 f"Add pyvalem-valid MolecularTermSymbol strings into "
-                f"postprocess_dataset.special_cases['{self.mol_formula}'] under the "
+                f"input.molecules.data['{self.mol_formula}']['mapping_el'] under the "
                 f"following keys: {str(failed_to_parse)[1:-1]}."
             )
         # now I have pyvalem-valid molecular term symbols, so just re-build the table
