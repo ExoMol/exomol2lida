@@ -135,7 +135,7 @@ data = {
     ],
     "resolve_el": ["State"],
     "resolve_vib": ["v"],
-    "only_without": {"State", "0"},
+    "only_without": {"State": "0"},
     "mapping_el": {
       ("b2Gamma",): "b(2GAMMA)",
       ("X",): "X(4SIGMA-)",
