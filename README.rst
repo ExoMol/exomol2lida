@@ -157,6 +157,12 @@ It might be best to show an example:
             "resolve_el": ["State"],
             "resolve_vib": ["v"],
             "only_without": {"State": "0"},
+        },
+        "HD+":{
+            "mol_slug": "H2",
+            "iso_slug": "1H-2H_p",
+            "dataset_name": "CLT",
+            ...
         }
     }
 
@@ -194,3 +200,60 @@ all the states with some vibrational quanta with values ``"*"`` or ``-1``, which
 do exist in many ExoMol dataset. But this was such a common occurrence, that such
 filtering is hard-coded into the algorithm and does not need to be explicitly defined
 by the input configuration file.
+
+The ``"HCN"`` isomers, as well as the ``"HD+"`` molecule are examples of the
+resulting LIDA molecule formulas differing from the ExoMol molecule formulas. The
+keys in the ``molecules`` dictionary specify the *LiDa* molecule names, which need to be
+unique within the LiDa ecosystem, while the first three mandatory parameters for each
+molecule define the path to the correct dataset within the *ExoMol* database.
+
+
+``mapping_el.py`` input
+-----------------------
+
+The `Lida database <https://github.com/ExoMol/lida-web>`_ will require ``pyvalem``
+compatible formulas of species, isotopologues and states. For them to be constructed,
+the electronic states *resolved* for each species need to take form of valid molecular
+term symbols, which ``pyvalem`` can parse. This is often the case without any
+intervention, often, when ExoMol dataset resolved electronic states, there exists a
+``"State"`` column in the .states file, populated with values which are in the
+``pyvalem`` compatible form already. In the cases where this is not the case, however,
+a mapping between the ExoMol electronic states and the LiDa (``pyvalem`` compatible)
+electronic state labels needs to be provided.
+
+The structure of this input file is made clear by the following self-explanatory
+example of the ``mapping_el.py`` input file:
+
+.. code-block:: python
+
+    mapping_el = {
+        "SiH": {
+            ("a4Sigma",): "a(4SIGMA-)",
+            ("B2Sigma",): "B(2SIGMA-)",
+        },
+        "NaH": {
+            ("X",): "X(1SIGMA+)",
+            ("A",): "A(1SIGMA+)"
+        },
+        "CN": {
+            ("X",): "X(2SIGMA+)",
+            ("A",): "A(2PI)",
+            ("B",): "B(2SIGMA+)"
+        },
+
+        ...
+
+    }
+
+In theory, there might be more than a single column of the ExoMol .states file
+associated with the *electronic* state, all necessary to resolve for LiDa, which is
+the reason for the keys of the mapping above being tuples. In all the examples above
+(and indeed in all the datasets processed so far), however, there is only a single
+column in the .states file describing the electronic state, which has been considered
+important to resolve for the lumped LiDa states. That is why all the ``tuple`` keys in
+the ``mapping_el`` dicts have only a single value. In the example above, the ``"X"`` and
+``"A"`` as keys on the ``"NaH"`` molecule actually represent all the possible values
+of the ``"State"`` column on the .states file for the NaH ExoMol dataset, where the
+corresponding input in the ``molecules.py`` would be
+``"NaH": {..., "resolve_el": ["State"], ...}``.
+
