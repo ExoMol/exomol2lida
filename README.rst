@@ -509,11 +509,50 @@ algorithm follows these steps:
 
         \frac{1}{\tau_i} = \sum_{f} \tau_{i \to f}.
 
+The algorithm described above is implemented in the ``exomol2lida.process_dataset``
+module inside the ``DataProcessor`` class. The class is well documented and the
+docstrings and the in-line comments serve as the best source of documentation and
+usage. A the end of the processing workflow, most of the output files (discussed above)
+are created. Apart the ``DataProcessor``, there is also the
+``exomol2lida.postprocess_dataset.DatasetPostProcessor`` class, which handles the
+conversion between electronic states as are in the ExoMol database, and ``pyvalem``
+compatible molecular term symbol labels expected by the LiDa database.
+
 
 The top-level scripts
 =====================
+Two top-level script exist which trigger the whole workflow. Assuming there exist an
+input entry for molecule, e.g. ``"H2O"`` in the ``input/molecules.py`` file, the
+calculation of the LiDa data for this molecule can be run by
 
+.. code-block:: bash
 
+    python process.py H2O
+
+Similarly, the data can be post-processed (after processing finished) aby running
+
+.. code-block:: bash
+
+    python postprocess.py H2O
+
+This assumes that if electronic states are resolved for this molecule, they either
+can be parsed automatically by the ``DatasetPostProcessor``, or the
+``input/mapping_el.py`` input file has defined the mapping to the valid molecular term
+symbols.
+
+Both can be run together by
+
+.. code-block:: bash
+
+    python process.py H2O --postprocess
+
+If anything goes wrong, hopefully the error message will give a hint on what happened.
+The processing and post-processing workflow can also be run on all the molecules found
+in the input files, by running
+
+.. code-block:: bash
+
+    python process.py all --postprocess
 
 
 The known issues
