@@ -464,18 +464,35 @@ The ``exomol2lida`` algorithm
 In this section, the main state-lumping algorithm is briefly described verbally. The
 algorithm follows these steps:
 
-1. Define the lumped states, create mapping between the original state ids and the lumps.
-   Each lumped state is uniquely identified by the set of distinct values of the columns
-   defined by the ``resolve_el`` and ``resolve_vib`` in the input file. In the example
-   case of ``{..., "resolve_vib": ["v1", "v2", "v3"], "resolve_el": ["State"], ...}``,
-   each lumped state is a collection of distinct values of the ``State, v1, v2, v3``
-   columns from the ExoMol .states file. Each lump will consist of a number of original
-   ExoMol states characterised with the same resolved quanta, but generally with different
-   values under *other* columns, and other quanta, such as "+/-", "J", etc. A mapping
-   is created between the lumped indices ``i`` and the original states indices ``i_orig``,
-   ``i -> {i_orig}``
+1.  Filter the original states from the .states file. This is where the input parameters
+    ``energy_max``, ``only_with`` and ``only_without`` come in, see the *inputs* section.
+    All the original states which do not survive this filtering will be completely
+    ignored for the further calculations.
 
-2. Assign energies to the lumped states.
+2.  Define the lumped states, create mapping between the original state ids and the lumps.
+    Each lumped state is uniquely identified by the set of distinct values of the columns
+    defined by the ``resolve_el`` and ``resolve_vib`` in the input file. In the example
+    case of ``{..., "resolve_vib": ["v1", "v2", "v3"], "resolve_el": ["State"], ...}``,
+    each lumped state is a collection of distinct values of the ``State, v1, v2, v3``
+    columns from the ExoMol .states file. Each lump will consist of a number of original
+    ExoMol states characterised with the same resolved quanta, but generally with different
+    values under *other* columns, and other quanta, such as "+/-", "J", etc. A mapping
+    is created between the lumped indices ``i`` and the original states indices ``i_orig``,
+    ``i -> {i_orig}``
+
+3.  Assign energies to the lumped states. Within each lump, the lowest-J states are
+    identified and the energy of the lump is set to be the average of the original
+    resolved states with the lowest J number, weighted by the ``g_tot`` total
+    degeneracies.
+
+4.  Lump the transitions and calculate the partial lifetimes of the lumped transitions.
+    If ``i``, ``f`` are the indices of the lumped states and ``i_orig``, ``f_orig`` are
+    indices of the original .states file, the partial lifetimes of each *lumped*
+    transition ``i -> f`` is calculated as
+
+    .. math::
+
+        \frac{1}{2}
 
 
 The top-level scripts
