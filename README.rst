@@ -495,7 +495,7 @@ algorithm follows these steps:
     indices of the filtered original states from the .trans file, the partial lifetimes
     of each *lumped* transition ``i -> f`` is calculated as
 
-    .. latex::
+    .. math::
 
         \tau_{i \to f} = \mathrm{avg}_{f_\mathrm{orig} \in f} (\tau_{i \to f_\mathrm{orig}}),
 
@@ -505,7 +505,7 @@ algorithm follows these steps:
 
 5.  Calculate the total lifetimes of the lumped states, as
 
-    .. latex::
+    .. math::
 
         \frac{1}{\tau_i} = \sum_{f} \tau_{i \to f}.
 
