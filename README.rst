@@ -486,13 +486,28 @@ algorithm follows these steps:
     degeneracies.
 
 4.  Lump the transitions and calculate the partial lifetimes of the lumped transitions.
+    First, all the in-lump transitions are ignored and not used in any way in the
+    calculations. Also, any transitions from and to a non-existing lump (such as to
+    and from the original states that did not survive the filtering within the state
+    lumping process, either too high energy, or regarding the ``only_with``, ``only_without``
+    parameters) are completely ignored.
     If ``i``, ``f`` are the indices of the lumped states and ``i_orig``, ``f_orig`` are
-    indices of the original .states file, the partial lifetimes of each *lumped*
-    transition ``i -> f`` is calculated as
+    indices of the filtered original states from the .trans file, the partial lifetimes
+    of each *lumped* transition ``i -> f`` is calculated as
 
-    .. math::
+    .. latex::
 
-        \frac{1}{2}
+        \tau_{i \to f} = \mathrm{avg}_{f_\mathrm{orig} \in f} (\tau_{i \to f_\mathrm{orig}}),
+
+        \frac{1}{\tau_{i \to f_\mathrm{orig}}} = \sum_{i_\mathrm{orig} \in i} A_{i_\mathrm{orig} \to f_\mathrm{orig}}.
+
+    Here, ``A`` refers to the einstein coefficients from the original .trans file.
+
+5.  Calculate the total lifetimes of the lumped states, as
+
+    .. latex::
+
+        \frac{1}{\tau_i} = \sum_{f} \tau_{i \to f}.
 
 
 The top-level scripts
