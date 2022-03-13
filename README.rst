@@ -433,6 +433,8 @@ In the cases where the electronic quanta values from the ExoMol .states file are
 both the ``output/formula/states_electronic_raw.csv`` and
 ``output/formula/states_electronic.csv`` will exist and will simply be identical.
 For the datasets which will not resolve electronic states, these files will not exist.
+While the ``states_electronic_raw.csv`` is produced by the ``exomol2lida.process_dataset``
+module, the ``states_electronic.csv`` is produced by the ``exomol2lida.postprocess_dataset``
 
 
 ``transitions_data.csv``
@@ -454,3 +456,35 @@ calculated partial lifetimes. The same example of the ``CN`` molecule gives
     100, 31, 0.00029494955495862026
 
 The ``i``, ``f`` values refer to the ids of the *lumped* states.
+
+
+The ``exomol2lida`` algorithm
+=============================
+
+In this section, the main state-lumping algorithm is briefly described verbally. The
+algorithm follows these steps:
+
+1. Define the lumped states, create mapping between the original state ids and the lumps.
+   Each lumped state is uniquely identified by the set of distinct values of the columns
+   defined by the ``resolve_el`` and ``resolve_vib`` in the input file. In the example
+   case of ``{..., "resolve_vib": ["v1", "v2", "v3"], "resolve_el": ["State"], ...}``,
+   each lumped state is a collection of distinct values of the ``State, v1, v2, v3``
+   columns from the ExoMol .states file. Each lump will consist of a number of original
+   ExoMol states characterised with the same resolved quanta, but generally with different
+   values under *other* columns, and other quanta, such as "+/-", "J", etc. A mapping
+   is created between the lumped indices ``i`` and the original states indices ``i_orig``,
+   ``i -> {i_orig}``
+
+2. Assign energies to the lumped states.
+
+
+The top-level scripts
+=====================
+
+
+
+
+The known issues
+================
+
+
