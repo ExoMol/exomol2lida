@@ -558,4 +558,96 @@ in the input files, by running
 The known issues
 ================
 
+This section discusses some of the known issues of the codebase and ideas for further
+development.
 
+-   A more powerful state filtering system is needed. As an example, the H3+ dataset
+    contains the ground state with (v1, v2) = (0, 0), which does not physically exist,
+    therefore does not have energy defined. The ``exomol2lida`` code runs fine, but
+    the lida database code breaks, as the energy of the (0, 0) state is set to ``NaN``
+    by the ``exomol2lida``, which cannot be dealt with by the lida code (different repo).
+    What is needed is the way to specify something like
+    ``"H3+": {..., "only_without": {("v1", "v2"): (0, 0)}, ...}``. This is currently
+    not supported, and the option of ``"only_without": {"v1": 0, "v2": 0}``, which is
+    supported, would also filter out states with vibrational quanta (0, 1), (0, 2), ...,
+    (1, 0), (2, 0), ...
+
+-   In the case of LiDa data built from the multiple isomers, such as the case of
+    HCN, built from ``"HCN": {..., "only_with": {"iso": 0}, ...}``, and
+    HNC, built from ``"HNC": {..., "only_with": {"iso": 1}, ...}``, both LiDa datasets
+    are built from a single ExoMol dataset, under the same molecule slug and isotopologue
+    slug. The ``exomol2lida`` code runs fine, but problems are created for the lida code
+    (different repo), because both isomers have the same isotopologue formula saved in
+    the ``meta_data.json`` output, specifically ``"(1H)(12C)(14N)"``. This is used by
+    the LiDa database code and there cannot exist two ``Isotopologue`` instances with
+    the same formula. What is needed is something like
+
+    .. code-block:: python
+
+        molecules = {
+
+            ...
+
+            "HNC": {
+                "mol_slug": "HCN",
+                "iso_slug": "1H-12C-14N",
+                "dataset_name": "Harris",
+                "resolve_vib": ["v1", "v2", "v3"],
+                "only_with": {"iso":  "1"},
+                "surrogate_iso_formula": "(1H)(14N)(12C)"
+            },
+
+            ...
+
+        }
+
+    and change in the processing code, which would save the surrogate formula into the
+    output ``meta_data.json`` file.
+
+-   Some datasets show very high lifetimes after processing, which are surely unphysical.
+    I have not looked into this in detail, but it does deserve some attention, to decide
+    if the ExoMol data are incorrect or if there is a problem with the algorithm. An example
+    of this is the SiH2 molecule, where all the states have lifetimes between 1e3 - 1e14 s.
+    But as other molecules have reasonable lifetimes, it is more probable that the .trans
+    file for this ExoMol dataset is in some way faulty, like incorrect units of einstein
+    coefficients, of swapped columns, etc. Investigation is needed, as well as some
+    safeguards against this happening.
+
+-   We get quite a lot of transitions from lower-energy states to higher-energy states.
+    This is understood, and it is the result of how the states are lumped, as each lump
+    includes states of the whole range of J numbers, but energy of the lump is calculated
+    only regarding the lowest-energy J. This is just to draw attention to the issue.
+
+-   In some cases, we see ground states with finite lifetimes. This should probably never
+    happen, and it can signal some possible problems with the algorithm (or inconsistent
+    .trans files to begin with, where there exist transitions from the ground states).
+    Further investigation is needed, examples of molecules with finite lifetimes of
+    the ground states are e.g. CaO, H2, NaCl, and others.
+
+-   Another non-bug is that we see some high-energy states with very high lifetimes,
+    caused by the .trans file not being complete and missing some radiation channels
+    for the very high energy states. This will often be a problem, because the .trans
+    files must be truncated somewhere. Question is where should the LiDa states and
+    transitions truncated, and how to detect incomplete transitions, so the lumped
+    transition and its initial state could be simply ignored as incomplete and therefore
+    with compromised data. One option could be truncate LiDa states by energy, but
+    question is where to set the threshold.
+
+-   The fact is that there probably is a strong need for some truncation. The algorithm
+    runs very slowly on the big molecules. Fact is that only molecules of manageable
+    size have been so far processed, and the largest molecules will probably take way
+    too long to be done by the algorithm as it is. The lumped states and transitions
+    probably will have to be truncated to limit the computational load, as well as
+    the size of the lumped dataset. Another thing is that the lifetimes and transitions
+    are so far lumped over all the J numbers, which might not be feasible for the large
+    molecules, and instead a reference J could be picked and the data calculated only
+    for that single J.
+
+-   Apart from the fact that some molecules are simply too large for the algorithm,
+    there appears to be a problem with the computational cost, where state lumping and
+    transitions lumping algorithm takes more and more time with each chunk of the
+    dataset data read from the exoweb server for a single molecule. For some reason,
+    more data is processed already, more time it takes to process the remaining data,
+    which should not be the case. Probably some profiling and optimization is needed,
+    I did not have the time to pinpoint the issue, but I'm fairly certain that the algo
+    could be optimized.
