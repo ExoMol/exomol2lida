@@ -38,7 +38,8 @@ Getting started
 
 - **Note**: The outputs for processed molecules are saved in the ``outputs`` directory.
   I have run the code on 27 molecules already, outputs of which can be found on exoweb
-  in ``mhanici`` user folder. This might be the best way to familiarize oneself with
+  in ``mhanici`` user folder on the exoweb server.
+  This might be the best way to familiarize oneself with
   the structure of the outputs. The outputs are by design excluded from the git VCS.
 
 
@@ -48,7 +49,7 @@ Project structure
 The project structure is as follows. Parts of the project will be later discussed in
 more detail.
 
-- ``config`` package contains ``config`` and ``config_local`` (not in VCS) modules
+- ``config`` package contains ``config`` and ``config_local`` (not under VCS) modules
   with some project-wide configuration options.
 
 - ``exomol2lida`` package contains all the code for the actual data generation
@@ -68,7 +69,8 @@ more detail.
 
 - ``preferred_isotopologues`` is a package grouping some functionality for guessing
   which isotopologue for each molecule is likely the most abundant one, and should be
-  a part of LIDA data.
+  a part of LIDA data. This is just a utility package and is not used implicitly by
+  any other parts of the ``exomol2lida`` workflow.
 
 - ``tests_unit`` and ``tests_integration`` are testing harnesses written for ``pytest``.
 
@@ -78,4 +80,117 @@ more detail.
 
 Input files
 ===========
+The input files located in the ``input`` folder are currently the following:
 
+- ``input/mapping_el.py``
+- ``input/molecules.py``
+
+Let us start with the ``molecules.py`` input file.
+
+
+``molecules.py`` input
+----------------------
+
+The main input file contains the configuration for each molecule that is supposed to
+be processed by ``exomol2lida``. The structure of the ``molecules.py`` file is the
+``dict`` with molecule formulas as keys and dictionaries with number of mandatory and
+optional attributes, as follows:
+
+.. code-block:: python
+
+    molecules = {
+        "molecule formula": {
+            "mol_slug": "molecule slug",  # mandatory
+            "iso_slug": "isotopologue slug",  # mandatory
+            "dataset_name": "the name of the dataset",  # mandatory
+            "resolve_vib": ["quantum 1", ..., "quantum n"],  # at least one of "resolve_*" needs to be given
+            "resolve_el": ["quantum 1", ..., "quantum m"],  # at least one of "resolve_*" needs to be given
+            "states_header": ["i", "E", "g_tot", "J", ..., "q_1", ..., "q_k"],  # if given, both "resolve_*" ignored
+            "energy_max": int("maximal energy [eV]"),  # optional, if not present, all data are used
+            "only_with": {"quantum": value},  # optional, if not present, all data are used
+            "only_without": {"quantum": value}  # optional, if not present, all data are used
+        },
+
+        ...,
+
+        "other molecule formula": {...}
+    }
+
+The ``molecule formula`` here needs to be a ``pyvalem`` compatible formula, but does not
+need to be the same as the ExoMol formula (but generally will be, with exception
+of distinguishing between isomers and different isotopologues of hydrogen).
+
+It might be best to show an example:
+
+.. code-block:: python
+
+    molecules = {
+        "CO": {
+            "mol_slug": "CO",
+            "iso_slug": "12C-16O",
+            "dataset_name": "Li2015",
+            "resolve_vib": ["v"]
+        },
+        "HCN": {
+            "mol_slug": "HCN",
+            "iso_slug": "1H-12C-14N",
+            "dataset_name": "Harris",
+            "resolve_vib": ["v1", "v2", "v3"],
+            "only_with": {"iso":  "0"}
+        },
+        "HNC": {
+            "mol_slug": "HCN",
+            "iso_slug": "1H-12C-14N",
+            "dataset_name": "Harris",
+            "resolve_vib": ["v1", "v2", "v3"],
+            "only_with": {"iso":  "1"},
+            "energy_max": 5.0
+        },
+        "VO": {
+            "mol_slug": "VO",
+            "iso_slug": "51V-16O",
+            "dataset_name": "VOMYT",
+            "states_header": [
+              "i", "E", "g_tot", "J", "tau", "+/-", "e/f", "State", "v", "Lambda", "Sigma",
+              "Omega"
+            ],
+            "resolve_el": ["State"],
+            "resolve_vib": ["v"],
+            "only_without": {"State": "0"},
+        }
+    }
+
+The mandatory ``"mol_slug"``, ``"iso_slug"``, ``"dataset_name"`` attributes identify
+the data within the ExoMol ecosystem. The ``"resolve_el"`` and ``"resolve_vib"``
+attributes need to exist as columns in the .states file for the given dataset and these
+quanta will be resolved in the final lida data. All the other quanta columns in the .states
+file will be lumped and averaged over. At least one of the ``"resolve_el"`` and
+``"resolve_vib"`` attributes need to be specified for each molecule.
+
+The ``"states_header"`` defines the names of all columns in the .states file for the
+dataset, and needs to have the same length as the number of the .states file's columns.
+Of course, the ``resolve_el | resolve_vib`` need to be subset of the ``states_header``.
+The ``"states_header"`` is optional in the configuration, if not provided, the columns
+are inferred from the .def file, if possible, or an error is raised. Therefore the
+``states_header`` attribute serves as a workaround for inconsistent .def/.states files.
+
+Finally, the ``"energy_max"``, ``"only_with"``, and ``"only_without"`` attributes
+specify the filtering of the data, in the way that states with higher energy than
+specified, states with quanta values given by ``only_without`` and all the states
+*other* than with quanta values given by ``only_with``, will be completely ignored, and
+their transitions will not be considered at all for calculations of the lifetimes
+of the final lumped states.
+
+This is shown on the ``"HCN"`` and ``"HNC"`` example, which produces two LIDA molecules
+out of a single ExoMol dataset, each only considering states with one of the
+isomers, denoted in the ExoMol dataset by the ``"iso"`` column in the .states file.
+
+Similarly, the ``"only_without"`` parameter can be used to filter out some unphysical
+or nonsensical states, such as was done for the ``"VO"`` example, which has a state
+(in the .states file) with value ``"0"`` under the ``"State"`` column, which needed to
+be ignored. This could be used filter out all the states (and transitions to and from)
+with a certain value of some specified quanta. One application would be to filter out
+all the states with some vibrational quanta with values ``"*"`` or ``-1``, which indeed
+do exist in many ExoMol dataset. But this was such a common occurrence, that such
+filtering is hard-coded into the algorithm and does not need to be explicitly defined
+by the input configuration file.
