@@ -604,6 +604,44 @@ development.
     and change in the processing code, which would save the surrogate formula into the
     output ``meta_data.json`` file.
 
+-   The process -> postprocess workflow as currently implemented works fine for the case
+    where there is a 1-to-1 relationship between the original state labels and the needed
+    ``pyvalem`` compatible labels defined in the ``input/mapping_el.py``. Unfortunatelly
+    there are cases of many-to-1 relationships, such as in the case of the VO molecule, 
+    for which the mapping looks like
+    
+    .. code-block:: python
+    
+        mapping_el = {
+            ...
+            "VO": {
+                ("b2Gamma",): "b(2GAMMA)",
+                ("X",): "X(4SIGMA-)",
+                ("a2",): "a(2SIGMA-)",
+                ("Ap",): "A'(4PHI)",
+                ("A",): "A(4PI)",
+                ("b2",): "b(2GAMMA)",
+                ("c2",): "c(2DELTA)",
+                ("d2",): "d(2SIGMA+)",
+                ("B",): "B(4PI)",
+                ("e2",): "e(2PHI)",
+                ("C",): "C(4SIGMA-)",
+                ("f2",): "f(2PI)",
+                ("D",): "D(4DELTA)",
+                ("g2",): "g(2PI)",
+            },
+            ...
+        }
+    
+    This breaks the code unfortunately, as the lumped states are created using the original
+    and in the post-processing we end up with several lumped states which should have been
+    a single one. To fix this, the electronic state label substitution for the ``pyvalem``
+    compatible strings needs to happen inside the lumping procedure within the processing.
+    This would than shift the post-processing workflow to the beginning of the processing
+    workflow - the state re-labeling will happen inside processing and post-processing will
+    not exist anymore. This needs to be implemented, as currently VO molecule fails in 
+    the post-processing step due to the reasons described.
+
 -   Some datasets show very high lifetimes after processing, which are surely unphysical.
     I have not looked into this in detail, but it does deserve some attention, to decide
     if the ExoMol data are incorrect or if there is a problem with the algorithm. An example
