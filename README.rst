@@ -633,8 +633,11 @@ development.
             ...
         }
     
+    As we can see, the ``"b2Gamma"`` and ``"b2"`` original states both need to be mapped
+    into a single ``pyvalem`` compatible ``"b(2GAMMA)"`` state string.    
     This breaks the code unfortunately, as the lumped states are created using the original
-    and in the post-processing we end up with several lumped states which should have been
+    state strings
+    and in the post-processing we end up with two lumped states which should have been
     a single one. To fix this, the electronic state label substitution for the ``pyvalem``
     compatible strings needs to happen inside the lumping procedure within the processing.
     This would than shift the post-processing workflow to the beginning of the processing
